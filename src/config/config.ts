@@ -23,7 +23,7 @@ interface NetworkConfig {
   currencies: {
     [address: string]: {
       name: string;
-      minProfit: bigint;
+      minETHPrice: bigint; // minimum price needed to buy 1 ether of token
     };
   };
 }
@@ -61,29 +61,26 @@ export const config: Config = {
       currencies: {
         "0x0000000000000000000000000000000000000000": {
           name: "ETH",
-          minProfit: ethers.parseEther("0.001"),
+          minETHPrice: ethers.parseEther("1"),
         },
         "0x692CA9D3078Aa6b54F2F0e33Ed20D30489854A21": {
           name: "PEPE",
-          minProfit: ethers.parseEther("10"),
+          minETHPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 PEPE
         },
       },
     },
   },
 
-  // 钱包配置
   wallet: {
     privateKey: requireEnv("PRIVATE_KEY"),
   },
 
-  // Gas 配置
   gas: {
     gasLimit: ethers.getBigInt(process.env.GAS_LIMIT || "300000"),
     maxPriorityFeePerGas: ethers.parseUnits(process.env.MAX_PRIORITY_FEE || "2", "gwei"),
     maxFeePerGas: ethers.parseUnits(process.env.MAX_FEE_PER_GAS || "50", "gwei"),
   },
 
-  // 机器人配置
   bot: {
     logLevel: process.env.LOG_LEVEL || "info",
     retryAttempts: parseInt(process.env.RETRY_ATTEMPTS || "3"),

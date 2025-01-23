@@ -119,8 +119,7 @@ export class EventListener {
         hookEvents.getEvent("Initialize").topicHash,
         positionEvents.getEvent("Margin").topicHash,
         positionEvents.getEvent("Burn").topicHash,
-        positionEvents.getEvent("Close").topicHash,
-        positionEvents.getEvent("Repay").topicHash,
+        positionEvents.getEvent("RepayClose").topicHash,
         positionEvents.getEvent("Modify").topicHash,
       ],
     ];
