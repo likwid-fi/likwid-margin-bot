@@ -55,9 +55,6 @@
    ETHEREUM_RPC_URL=your_rpc_url
    PRIVATE_KEY=your_private_key
    CHAIN_ID=1
-   GAS_LIMIT=300000
-   MAX_PRIORITY_FEE=2
-   MAX_FEE_PER_GAS=50
    ```
 
 4. 生成合约类型

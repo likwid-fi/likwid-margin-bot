@@ -41,11 +41,6 @@ interface Config {
     maxPriorityFeePerGas: bigint;
     maxFeePerGas: bigint;
   };
-  bot: {
-    logLevel: string;
-    retryAttempts: number;
-    retryDelay: number;
-  };
 }
 
 // 配置对象
@@ -85,12 +80,6 @@ export const config: Config = {
     gasLimit: ethers.getBigInt(process.env.GAS_LIMIT || "300000"),
     maxPriorityFeePerGas: ethers.parseUnits(process.env.MAX_PRIORITY_FEE || "2", "gwei"),
     maxFeePerGas: ethers.parseUnits(process.env.MAX_FEE_PER_GAS || "50", "gwei"),
-  },
-
-  bot: {
-    logLevel: process.env.LOG_LEVEL || "info",
-    retryAttempts: parseInt(process.env.RETRY_ATTEMPTS || "3"),
-    retryDelay: parseInt(process.env.RETRY_DELAY || "1000"),
   },
 } as const;
 

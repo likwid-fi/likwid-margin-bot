@@ -105,7 +105,7 @@ export class LiquidationWorker {
           try {
             const estimateGas = await this.contractService.estimateLiquidateBurn(burnParams);
             if (estimateGas > obtainAmount) {
-              console.log(`estimateGas:${estimateGas},obtainAmount:${obtainAmount}`);
+              console.log(`estimateGas > obtainAmount, estimateGas:${estimateGas},obtainAmount:${obtainAmount}`);
               continue;
             }
             const tx = await this.contractService.liquidateBurn(burnParams);
