@@ -24,7 +24,8 @@ interface NetworkConfig {
   currencies: {
     [address: string]: {
       name: string;
-      minETHPrice: bigint; // minimum price needed to buy 1 ether of token
+      // minimum ETH needed to buy 10^18 wei of token ps:decimals=8;symbol=TEST;1 ETH=3333 TEST; minEtherPrice=(1*10^18)*(10^18) / (10^8) / 3333=3000300*(10^18)
+      minEtherPrice: bigint;
     };
   };
 }
@@ -58,15 +59,15 @@ export const config: Config = {
       currencies: {
         "0x0000000000000000000000000000000000000000": {
           name: "ETH",
-          minETHPrice: ethers.parseEther("1"),
+          minEtherPrice: ethers.parseEther("1"),
         },
         "0x692CA9D3078Aa6b54F2F0e33Ed20D30489854A21": {
           name: "PEPE",
-          minETHPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 PEPE
+          minEtherPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 PEPE
         },
         "0x8b099f91c710ce9e5ee5b7f2e83db9bac3378975": {
           name: "LIKWID",
-          minETHPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 LIKWID
+          minEtherPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 LIKWID
         },
       },
     },
@@ -91,7 +92,7 @@ export function validateCurrency(chainId: number, currency: string) {
   return currencies.hasOwnProperty(currency);
 }
 
-export function getCurrencyMinETHPrice(chainId: number, currency: string) {
+export function getCurrencyminEtherPrice(chainId: number, currency: string) {
   const currencies = config.networks[chainId].currencies;
-  return currencies[currency].minETHPrice;
+  return currencies[currency].minEtherPrice;
 }

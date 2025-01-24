@@ -1,4 +1,4 @@
-import { config, getCurrencyMinETHPrice } from "../config/config";
+import { config, getCurrencyminEtherPrice } from "../config/config";
 import type { MarginPositionManager } from "../types/contracts/MarginPositionManager";
 import { ContractService, initializeContracts } from "./contracts";
 import { DatabaseService } from "./database";
@@ -92,8 +92,8 @@ export class LiquidationWorker {
             `Found ${liquidateIds.length} liquidateIds positions in pool ${group.pool_id},obtainTotal:${obtainTotal}`
           );
 
-          const minETHPrice = getCurrencyMinETHPrice(this.chainId, positions[0].margin_token);
-          const obtainAmount = (minETHPrice * obtainTotal) / (10n ^ 18n);
+          const minEtherPrice = getCurrencyminEtherPrice(this.chainId, positions[0].margin_token);
+          const obtainAmount = (minEtherPrice * obtainTotal) / (10n ^ 18n);
 
           const burnParams = {
             poolId: group.pool_id,
