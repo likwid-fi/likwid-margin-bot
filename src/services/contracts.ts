@@ -61,6 +61,12 @@ export class ContractService {
     return await this.contracts.marginPositionManager.estimatePNL(positionId, repayMillionth);
   }
 
+  async estimateLiquidateBurn(params: BurnParamsStruct) {
+    return await this.contracts.marginPositionManager["liquidateBurn((bytes32,bool,uint256[],bytes))"].estimateGas(
+      params
+    );
+  }
+
   async liquidateBurn(params: BurnParamsStruct) {
     return await this.contracts.marginPositionManager["liquidateBurn((bytes32,bool,uint256[],bytes))"](params);
   }

@@ -69,6 +69,10 @@ export const config: Config = {
           name: "PEPE",
           minETHPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 PEPE
         },
+        "0x8b099f91c710ce9e5ee5b7f2e83db9bac3378975": {
+          name: "LIKWID",
+          minETHPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 LIKWID
+        },
       },
     },
   },
@@ -96,4 +100,9 @@ export function validateCurrency(chainId: number, currency: string) {
     return true;
   }
   return currencies.hasOwnProperty(currency);
+}
+
+export function getCurrencyMinETHPrice(chainId: number, currency: string) {
+  const currencies = config.networks[chainId].currencies;
+  return currencies[currency].minETHPrice;
 }

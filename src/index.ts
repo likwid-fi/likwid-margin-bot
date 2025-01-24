@@ -1,5 +1,6 @@
 import { DatabaseService } from "./services/database";
 import { EventListener } from "./services/eventListener";
+import { LiquidationWorker } from "./services/liquidationWorker";
 
 async function main() {
   try {
@@ -14,6 +15,10 @@ async function main() {
     // start listening to events
     await eventListener.startListening();
     console.log("Started listening for events...");
+
+    const liquidationWorker = new LiquidationWorker(dbService, chainId);
+    await liquidationWorker.initialize();
+    await liquidationWorker.start();
 
     // keep program running
     process.stdin.resume();

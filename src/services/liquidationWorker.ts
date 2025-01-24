@@ -1,4 +1,4 @@
-import { config } from "../config/config";
+import { config, getCurrencyMinETHPrice } from "../config/config";
 import type { MarginPositionManager } from "../types/contracts/MarginPositionManager";
 import { ContractService, initializeContracts } from "./contracts";
 import { DatabaseService } from "./database";
@@ -11,6 +11,9 @@ interface PositionGroup {
 
 interface Position {
   position_id: string;
+  margin_amount: string;
+  margin_total: string;
+  margin_token: string;
 }
 
 export class LiquidationWorker {
@@ -56,6 +59,7 @@ export class LiquidationWorker {
 
   private async checkLiquidations() {
     const positionGroups = this.db.getPositionGroups(this.chainId) as PositionGroup[];
+    console.log("checkLiquidations.positionGroups", positionGroups.length);
 
     for (const group of positionGroups) {
       try {
@@ -70,11 +74,26 @@ export class LiquidationWorker {
         const positionIds = positions.map((p) => BigInt(p.position_id));
         const managerAddress = await this.contractService.getMarginPositionManager().getAddress();
         const liquidationStates = await this.contractService.checkLiquidateByIds(managerAddress, positionIds);
-
         const liquidateIds = positionIds.filter((_, index) => liquidationStates.liquidatedList[index]);
+        const liquidatePositions = positions.filter((_, index) => liquidationStates.liquidatedList[index]);
+        const releaseAmountList = liquidationStates.releaseAmountList.filter(
+          (_, index) => liquidationStates.liquidatedList[index]
+        );
+        let obtainTotal = 0n;
+        for (let i = 0; i < liquidateIds.length; i++) {
+          const position = liquidatePositions[i];
+          const assetAmount = BigInt(position.margin_amount) + BigInt(position.margin_total) - releaseAmountList[i];
+          if (assetAmount > 0) {
+            obtainTotal += assetAmount;
+          }
+        }
+        if (liquidateIds.length > 0 && obtainTotal > 0) {
+          console.log(
+            `Found ${liquidateIds.length} liquidateIds positions in pool ${group.pool_id},obtainTotal:${obtainTotal}`
+          );
 
-        if (liquidateIds.length > 0) {
-          console.log(`Found ${liquidateIds.length} liquidateIds positions in pool ${group.pool_id}`);
+          const minETHPrice = getCurrencyMinETHPrice(this.chainId, positions[0].margin_token);
+          const obtainAmount = (minETHPrice * obtainTotal) / (10n ^ 18n);
 
           const burnParams = {
             poolId: group.pool_id,
@@ -84,12 +103,20 @@ export class LiquidationWorker {
           };
 
           try {
+            const estimateGas = await this.contractService.estimateLiquidateBurn(burnParams);
+            if (estimateGas > obtainAmount) {
+              console.log(`estimateGas:${estimateGas},obtainAmount:${obtainAmount}`);
+              continue;
+            }
             const tx = await this.contractService.liquidateBurn(burnParams);
             console.log(`Liquidation transaction sent: ${tx.hash}`);
 
             const receipt = await tx.wait();
             if (receipt && receipt.status === 1) {
-              console.log(`Successfully liquidated positions in pool ${group.pool_id}`);
+              console.log(
+                `Successfully liquidated positions in pool ${group.pool_id}, delete positions:${liquidateIds}`
+              );
+              this.db.deletePositionByIds(this.chainId, managerAddress, liquidateIds);
             } else {
               console.error(`Failed to liquidate positions in pool ${group.pool_id}`);
             }

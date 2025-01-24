@@ -198,6 +198,12 @@ export class DatabaseService {
       .run(chainId, managerAddress, positionId);
   }
 
+  deletePositionByIds(chainId: number, managerAddress: string, positionIds: bigint[]) {
+    this.db
+      .prepare("DELETE FROM margin_positions WHERE chain_id = ? AND manager_address = ? AND position_id IN (?)")
+      .run(chainId, managerAddress, positionIds);
+  }
+
   // Get position groups
   getPositionGroups(chainId: number) {
     return this.db
