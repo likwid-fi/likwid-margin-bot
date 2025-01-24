@@ -1,4 +1,6 @@
-import { ContractService } from "./contracts";
+import { config } from "../config/config";
+import type { MarginPositionManager } from "../types/contracts/MarginPositionManager";
+import { ContractService, initializeContracts } from "./contracts";
 import { DatabaseService } from "./database";
 import { ethers } from "ethers";
 
@@ -13,16 +15,24 @@ interface Position {
 
 export class LiquidationWorker {
   private db: DatabaseService;
-  private contractService: ContractService;
+  private provider: ethers.Provider;
+  private contractService!: ContractService;
   private isRunning: boolean = false;
   private chainId: number;
-  private managerAddress: string;
 
-  constructor(db: DatabaseService, contractService: ContractService, chainId: number, managerAddress: string) {
+  constructor(db: DatabaseService, chainId: number) {
     this.db = db;
-    this.contractService = contractService;
     this.chainId = chainId;
-    this.managerAddress = managerAddress;
+    const network = config.networks[chainId];
+    const provider = new ethers.JsonRpcProvider(network.rpcUrl);
+    this.provider = provider;
+  }
+
+  async initialize() {
+    const network = config.networks[this.chainId];
+    const wallet = new ethers.Wallet(config.wallet.privateKey, this.provider);
+    const contracts = await initializeContracts(network.contracts, wallet);
+    this.contractService = new ContractService(contracts);
   }
 
   async start() {
@@ -58,7 +68,8 @@ export class LiquidationWorker {
         if (positions.length === 0) continue;
 
         const positionIds = positions.map((p) => BigInt(p.position_id));
-        const liquidationStates = await this.contractService.checkLiquidateByIds(this.managerAddress, positionIds);
+        const managerAddress = await this.contractService.getMarginPositionManager().getAddress();
+        const liquidationStates = await this.contractService.checkLiquidateByIds(managerAddress, positionIds);
 
         const liquidateIds = positionIds.filter((_, index) => liquidationStates.liquidatedList[index]);
 

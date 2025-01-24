@@ -45,6 +45,10 @@ export class ContractService {
   }
 
   // MarginPositionManager
+  getMarginPositionManager() {
+    return this.contracts.marginPositionManager;
+  }
+
   async getPosition(positionId: bigint) {
     return await this.contracts.marginPositionManager.getPosition(positionId);
   }
