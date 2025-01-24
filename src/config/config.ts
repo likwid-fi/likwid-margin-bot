@@ -17,6 +17,7 @@ interface NetworkConfig {
   rpcUrl: string;
   contracts: {
     startBlock: number;
+    marginChecker: string;
     marginHookManager: string;
     marginPositionManager: string;
   };
@@ -55,8 +56,9 @@ export const config: Config = {
       rpcUrl: "https://ethereum-sepolia.publicnode.com",
       contracts: {
         startBlock: 7461647,
+        marginChecker: "0xE50794a80Befe17c584026f6f40bbeC3Dc764D83",
         marginHookManager: "0x59036D328EFF4dAb2E33E04a60A5D810Df90C888",
-        marginPositionManager: "0x3297e9416415A67c6fFb9786C71a4d8C21b78DeF",
+        marginPositionManager: "0x913B98B271889D3fB4D375C181FC2E58f17EC6C5",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {

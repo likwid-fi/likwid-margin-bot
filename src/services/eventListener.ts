@@ -7,12 +7,18 @@ import type { TypedEventLog, TypedListener, TypedContractEvent } from "../types/
 import { config, validateCurrency } from "../config/config";
 
 type MarginEvent = TypedContractEvent<
-  [positionId: bigint, poolId: string, user: string, marginAmount: bigint, borrowAmount: bigint, marginForOne: boolean]
+  [
+    poolId: string,
+    owner: string,
+    positionId: bigint,
+    marginAmount: bigint,
+    marginTotal: bigint,
+    borrowAmount: bigint,
+    marginForOne: boolean
+  ]
 >;
 
-type CloseEvent = TypedContractEvent<[positionId: bigint, user: string]>;
-
-type HookEvent = TypedContractEvent<[poolId: string]>;
+type BurnEvent = TypedContractEvent<[poolId: string, sender: string, positionId: bigint, burnType: bigint]>;
 
 export class EventListener {
   private db: DatabaseService;
@@ -58,47 +64,42 @@ export class EventListener {
 
   // listen to new events
   private listenToNewEvents() {
-    // MarginPositionManager 事件
-    // this.contracts.marginPositionManager.on(this.contracts.marginPositionManager.filters.Margin, (async (
-    //   positionId: bigint,
-    //   poolId: string,
-    //   user: string,
-    //   marginAmount: bigint,
-    //   borrowAmount: bigint,
-    //   marginForOne: boolean,
-    //   event: TypedEventLog<MarginEvent>
-    // ) => {
-    //   await this.handleMarginEvent({
-    //     positionId,
-    //     poolId,
-    //     user,
-    //     marginAmount,
-    //     borrowAmount,
-    //     marginForOne,
-    //     event,
-    //   });
-    // }) as TypedListener<MarginEvent>);
-    // this.contracts.marginPositionManager.on(this.contracts.marginPositionManager.filters.Close, (async (
-    //   positionId: bigint,
-    //   user: string,
-    //   event: TypedEventLog<CloseEvent>
-    // ) => {
-    //   await this.handleCloseEvent({
-    //     positionId,
-    //     user,
-    //     event,
-    //   });
-    // }) as TypedListener<CloseEvent>);
-    // // MarginHookManager 事件
-    // for (const [eventName, filter] of Object.entries(this.contracts.marginHookManager.filters)) {
-    //   this.contracts.marginHookManager.on(filter, (async (poolId: string, event: TypedEventLog<HookEvent>) => {
-    //     await this.handleHookEvent({
-    //       poolId,
-    //       event,
-    //       eventName,
-    //     });
-    //   }) as TypedListener<HookEvent>);
-    // }
+    this.contracts.marginPositionManager.on(this.contracts.marginPositionManager.filters.Margin, (async (
+      poolId: string,
+      owner: string,
+      positionId: bigint,
+      marginAmount: bigint,
+      marginTotal: bigint,
+      borrowAmount: bigint,
+      marginForOne: boolean,
+      event: TypedEventLog<MarginEvent>
+    ) => {
+      await this.handleMarginEvent({
+        poolId,
+        owner,
+        positionId,
+        marginAmount,
+        marginTotal,
+        borrowAmount,
+        marginForOne,
+        event,
+      });
+    }) as TypedListener<MarginEvent>);
+    this.contracts.marginPositionManager.on(this.contracts.marginPositionManager.filters.Burn, (async (
+      poolId: string,
+      sender: string,
+      positionId: bigint,
+      burnType: bigint,
+      event: TypedEventLog<BurnEvent>
+    ) => {
+      await this.handleBurnEvent({
+        poolId,
+        sender,
+        positionId,
+        burnType,
+        event,
+      });
+    }) as TypedListener<BurnEvent>);
   }
 
   // sync historical events from contracts
@@ -196,65 +197,44 @@ export class EventListener {
     }
   }
 
-  //   // 处理 Margin 事件
-  //   private async handleMarginEvent(params: {
-  //     positionId: bigint;
-  //     poolId: string;
-  //     user: string;
-  //     marginAmount: bigint;
-  //     borrowAmount: bigint;
-  //     marginForOne: boolean;
-  //     event: TypedEventLog<MarginEvent>;
-  //   }) {
-  //     const block = await this.provider.getBlock(params.event.blockNumber);
-  //     if (!block) return;
+  // 处理 Margin 事件
+  private async handleMarginEvent(params: {
+    poolId: string;
+    owner: string;
+    positionId: bigint;
+    marginAmount: bigint;
+    marginTotal: bigint;
+    borrowAmount: bigint;
+    marginForOne: boolean;
+    event: TypedEventLog<MarginEvent>;
+  }) {
+    const positionManagerAddress = await this.contracts.marginPositionManager.getAddress();
+    const pool = this.db.getPool(this.chainId, params.poolId);
+    if (!pool) return;
+    const marginToken = params.marginForOne ? pool.currency1 : pool.currency0;
+    this.db.savePosition({
+      chainId: this.chainId,
+      managerAddress: positionManagerAddress,
+      positionId: params.positionId,
+      poolId: params.poolId,
+      ownerAddress: params.owner,
+      marginAmount: params.marginAmount,
+      marginTotal: params.marginTotal,
+      borrowAmount: params.borrowAmount,
+      marginForOne: params.marginForOne,
+      marginToken: marginToken,
+    });
+  }
 
-  //     this.db.saveEvent({
-  //       contractAddress: params.event.address,
-  //       eventName: "Margin",
-  //       blockNumber: params.event.blockNumber,
-  //       transactionHash: params.event.transactionHash,
-  //       timestamp: block.timestamp,
-  //       positionId: params.positionId,
-  //       poolId: params.poolId,
-  //       userAddress: params.user,
-  //       marginAmount: params.marginAmount,
-  //       borrowAmount: params.borrowAmount,
-  //       marginForOne: params.marginForOne,
-  //       rawData: JSON.stringify(params.event),
-  //     });
-  //   }
-
-  //   // 处理 Close 事件
-  //   private async handleCloseEvent(params: { positionId: bigint; user: string; event: TypedEventLog<CloseEvent> }) {
-  //     const block = await this.provider.getBlock(params.event.blockNumber);
-  //     if (!block) return;
-
-  //     this.db.saveEvent({
-  //       contractAddress: params.event.address,
-  //       eventName: "Close",
-  //       blockNumber: params.event.blockNumber,
-  //       transactionHash: params.event.transactionHash,
-  //       timestamp: block.timestamp,
-  //       positionId: params.positionId,
-  //       userAddress: params.user,
-  //       rawData: JSON.stringify(params.event),
-  //     });
-  //   }
-
-  //   // 处理 Hook 事件
-  //   private async handleHookEvent(params: { poolId: string; event: TypedEventLog<HookEvent>; eventName: string }) {
-  //     const block = await this.provider.getBlock(params.event.blockNumber);
-  //     if (!block) return;
-
-  //     this.db.saveEvent({
-  //       contractAddress: params.event.address,
-  //       eventName: params.eventName,
-  //       blockNumber: params.event.blockNumber,
-  //       transactionHash: params.event.transactionHash,
-  //       timestamp: block.timestamp,
-  //       poolId: params.poolId,
-  //       rawData: JSON.stringify(params.event),
-  //     });
-  //   }
+  // 处理 Burn 事件
+  private async handleBurnEvent(params: {
+    poolId: string;
+    sender: string;
+    positionId: bigint;
+    burnType: bigint;
+    event: TypedEventLog<BurnEvent>;
+  }) {
+    const positionManagerAddress = await this.contracts.marginPositionManager.getAddress();
+    this.db.deletePosition(this.chainId, positionManagerAddress, Number(params.positionId));
+  }
 }

@@ -197,4 +197,27 @@ export class DatabaseService {
       .prepare("DELETE FROM margin_positions WHERE chain_id = ? AND manager_address = ? AND position_id = ?")
       .run(chainId, managerAddress, positionId);
   }
+
+  // Get position groups
+  getPositionGroups(chainId: number) {
+    return this.db
+      .prepare(
+        `SELECT DISTINCT pool_id, margin_for_one 
+           FROM margin_positions 
+           WHERE chain_id = ?`
+      )
+      .all(chainId);
+  }
+
+  // Get positions by group
+  getPositionsByGroup(chainId: number, poolId: string, marginForOne: boolean) {
+    return this.db
+      .prepare(
+        `SELECT * FROM margin_positions 
+           WHERE chain_id = ? 
+           AND pool_id = ? 
+           AND margin_for_one = ?`
+      )
+      .all(chainId, poolId, marginForOne ? 1 : 0);
+  }
 }
