@@ -6,23 +6,23 @@ interface SyncState {
 }
 
 interface MarginPool {
-  chainId: number;
-  poolId: string;
+  chain_id: number;
+  pool_id: string;
   currency0: string;
   currency1: string;
 }
 
 interface MarginPosition {
-  chainId: number;
-  managerAddress: string;
-  positionId: number;
-  poolId: string;
-  ownerAddress: string;
-  marginAmount: string;
-  marginTotal: string;
-  borrowAmount: string;
-  marginForOne: boolean;
-  marginToken: string;
+  chain_id: number;
+  manager_address: string;
+  position_id: number;
+  pool_id: string;
+  owner_address: string;
+  margin_amount: string;
+  margin_total: string;
+  borrow_amount: string;
+  margin_for_one: number;
+  margin_token: string;
 }
 
 export class DatabaseService {
