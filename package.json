@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev --transpile-only src/index.ts",
-    "build": "npm run typechain && tsc",
+    "build": "tsc",
+    "build:dev": "npm run typechain && tsc",
     "lint": "eslint . --ext .ts",
     "test": "jest",
     "typechain": "typechain --target ethers-v6 --out-dir src/types/contracts src/abis/*.json"

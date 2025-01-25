@@ -1,10 +1,9 @@
 import dotenv from "dotenv";
 import { ethers } from "ethers";
 
-// 加载环境变量
+// Load environment variables
 dotenv.config();
 
-// 环境变量验证函数
 function requireEnv(key: string): string {
   const value = process.env[key];
   if (!value) {
@@ -24,7 +23,8 @@ interface NetworkConfig {
   currencies: {
     [address: string]: {
       name: string;
-      // minimum ETH needed to buy 10^18 wei of token ps:decimals=8;symbol=TEST;1 ETH=3333 TEST; minEtherPrice=(1*10^18)*(10^18) / (10^8) / 3333=3000300*(10^18)
+      // minimum ETH needed to buy 10^18 wei of token
+      // symbol=TEST;decimals=8;1 ETH=3333 TEST; minEtherPrice=(1 * 10^18) / ((10^8) * 3333) * (10^18)=3000300*(10^18)
       minEtherPrice: bigint;
     };
   };
@@ -36,11 +36,6 @@ interface Config {
   };
   wallet: {
     privateKey: string;
-  };
-  gas: {
-    gasLimit: bigint;
-    maxPriorityFeePerGas: bigint;
-    maxFeePerGas: bigint;
   };
 }
 
@@ -76,12 +71,6 @@ export const config: Config = {
   wallet: {
     privateKey: requireEnv("PRIVATE_KEY"),
   },
-
-  gas: {
-    gasLimit: ethers.getBigInt(process.env.GAS_LIMIT || "300000"),
-    maxPriorityFeePerGas: ethers.parseUnits(process.env.MAX_PRIORITY_FEE || "2", "gwei"),
-    maxFeePerGas: ethers.parseUnits(process.env.MAX_FEE_PER_GAS || "50", "gwei"),
-  },
 } as const;
 
 export function validateCurrency(chainId: number, currency: string) {
@@ -92,7 +81,7 @@ export function validateCurrency(chainId: number, currency: string) {
   return currencies.hasOwnProperty(currency);
 }
 
-export function getCurrencyminEtherPrice(chainId: number, currency: string) {
+export function getCurrencyMinEtherPrice(chainId: number, currency: string) {
   const currencies = config.networks[chainId].currencies;
   return currencies[currency].minEtherPrice;
 }

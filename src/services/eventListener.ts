@@ -1,24 +1,7 @@
 import { ethers } from "ethers";
-import { DatabaseService } from "./database";
-import type { MarginPositionManager } from "../types/contracts/MarginPositionManager";
-import type { MarginHookManager } from "../types/contracts/MarginHookManager";
-import { Contracts, ContractService, initializeContracts } from "./contracts";
-import type { TypedEventLog, TypedListener, TypedContractEvent } from "../types/contracts/common";
 import { config, validateCurrency } from "../config/config";
-
-type MarginEvent = TypedContractEvent<
-  [
-    poolId: string,
-    owner: string,
-    positionId: bigint,
-    marginAmount: bigint,
-    marginTotal: bigint,
-    borrowAmount: bigint,
-    marginForOne: boolean
-  ]
->;
-
-type BurnEvent = TypedContractEvent<[poolId: string, sender: string, positionId: bigint, burnType: bigint]>;
+import { Contracts, initializeContracts } from "./contracts";
+import { DatabaseService } from "./database";
 
 export class EventListener {
   private db: DatabaseService;

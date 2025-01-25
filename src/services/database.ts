@@ -1,5 +1,4 @@
 import Database from "better-sqlite3";
-import { ethers } from "ethers";
 
 interface SyncState {
   last_synced_block: number;
@@ -10,19 +9,6 @@ interface MarginPool {
   pool_id: string;
   currency0: string;
   currency1: string;
-}
-
-interface MarginPosition {
-  chain_id: number;
-  manager_address: string;
-  position_id: number;
-  pool_id: string;
-  owner_address: string;
-  margin_amount: string;
-  margin_total: string;
-  borrow_amount: string;
-  margin_for_one: number;
-  margin_token: string;
 }
 
 export class DatabaseService {

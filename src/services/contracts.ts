@@ -7,21 +7,18 @@ import type { MarginParamsStruct, BurnParamsStruct } from "../types/contracts/Ma
 import { MarginChecker__factory } from "../types/contracts/factories/MarginChecker__factory";
 import type { MarginChecker } from "../types/contracts/MarginChecker";
 
-// 合约地址类型
 export interface ContractAddresses {
   marginChecker: string;
   marginHookManager: string;
   marginPositionManager: string;
 }
 
-// 合约实例类型
 export interface Contracts {
   marginChecker: MarginChecker;
   marginHookManager: MarginHookManager;
   marginPositionManager: MarginPositionManager;
 }
 
-// 初始化合约
 export async function initializeContracts(addresses: ContractAddresses, runner: ContractRunner): Promise<Contracts> {
   const marginChecker = MarginChecker__factory.connect(addresses.marginChecker, runner);
 
@@ -36,7 +33,6 @@ export async function initializeContracts(addresses: ContractAddresses, runner: 
   };
 }
 
-// 合约服务
 export class ContractService {
   private contracts: Contracts;
 

@@ -1,5 +1,4 @@
-import { config, getCurrencyminEtherPrice } from "../config/config";
-import type { MarginPositionManager } from "../types/contracts/MarginPositionManager";
+import { config, getCurrencyMinEtherPrice } from "../config/config";
 import { ContractService, initializeContracts } from "./contracts";
 import { DatabaseService } from "./database";
 import { ethers } from "ethers";
@@ -45,6 +44,7 @@ export class LiquidationWorker {
     while (this.isRunning) {
       try {
         await this.checkLiquidations();
+        // sleep 10 seconds
         await new Promise((resolve) => setTimeout(resolve, 10000));
       } catch (error) {
         console.error("Error in liquidation check:", error);
@@ -92,7 +92,7 @@ export class LiquidationWorker {
             `Found ${liquidateIds.length} liquidateIds positions in pool ${group.pool_id},obtainTotal:${obtainTotal}`
           );
 
-          const minEtherPrice = getCurrencyminEtherPrice(this.chainId, positions[0].margin_token);
+          const minEtherPrice = getCurrencyMinEtherPrice(this.chainId, positions[0].margin_token);
           const obtainAmount = (minEtherPrice * obtainTotal) / (10n ^ 18n);
 
           const burnParams = {
@@ -105,7 +105,9 @@ export class LiquidationWorker {
           try {
             const estimateGas = await this.contractService.estimateLiquidateBurn(burnParams);
             if (estimateGas > obtainAmount) {
-              console.log(`estimateGas > obtainAmount, estimateGas:${estimateGas},obtainAmount:${obtainAmount}`);
+              console.log(
+                `estimateGas > obtainAmount condition not met, estimateGas: ${estimateGas}, obtainAmount: ${obtainAmount}`
+              );
               continue;
             }
             const tx = await this.contractService.liquidateBurn(burnParams);
