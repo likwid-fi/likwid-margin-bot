@@ -47,9 +47,9 @@ export const config: Config = {
       rpcUrl: "https://ethereum-sepolia.publicnode.com",
       contracts: {
         startBlock: 7461647,
-        marginChecker: "0xE50794a80Befe17c584026f6f40bbeC3Dc764D83",
+        marginChecker: "0x27354b639DCBA5dC85343019367f3b494161aA48",
         marginHookManager: "0x59036D328EFF4dAb2E33E04a60A5D810Df90C888",
-        marginPositionManager: "0x913B98B271889D3fB4D375C181FC2E58f17EC6C5",
+        marginPositionManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {

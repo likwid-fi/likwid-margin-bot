@@ -57,17 +57,20 @@ export class LiquidationWorker {
     this.isRunning = false;
   }
 
+  private async calculateTransactionFee(estimateGas: bigint): Promise<bigint> {
+    const feeData = await this.provider.getFeeData();
+    const gasPrice = feeData.gasPrice || 1n; // Use 0n if gasPrice is undefined
+    return estimateGas * gasPrice;
+  }
+
   private async checkLiquidations() {
     const positionGroups = this.db.getPositionGroups(this.chainId) as PositionGroup[];
     console.log("checkLiquidations.positionGroups", positionGroups.length);
 
     for (const group of positionGroups) {
       try {
-        const positions = this.db.getPositionsByGroup(
-          this.chainId,
-          group.pool_id,
-          group.margin_for_one === 1
-        ) as Position[];
+        const marginForOne = group.margin_for_one === 1;
+        const positions = this.db.getPositionsByGroup(this.chainId, group.pool_id, marginForOne) as Position[];
 
         if (positions.length === 0) continue;
 
@@ -76,38 +79,37 @@ export class LiquidationWorker {
         const liquidationStates = await this.contractService.checkLiquidateByIds(managerAddress, positionIds);
         const liquidateIds = positionIds.filter((_, index) => liquidationStates.liquidatedList[index]);
         const liquidatePositions = positions.filter((_, index) => liquidationStates.liquidatedList[index]);
-        const releaseAmountList = liquidationStates.releaseAmountList.filter(
-          (_, index) => liquidationStates.liquidatedList[index]
-        );
-        let obtainTotal = 0n;
+
+        let marginAmount = 0n;
+        let assetAmount = 0n;
         for (let i = 0; i < liquidateIds.length; i++) {
           const position = liquidatePositions[i];
-          const assetAmount = BigInt(position.margin_amount) + BigInt(position.margin_total) - releaseAmountList[i];
-          if (assetAmount > 0) {
-            obtainTotal += assetAmount;
-          }
+          marginAmount += BigInt(position.margin_amount);
+          assetAmount += BigInt(position.margin_amount) + BigInt(position.margin_total);
         }
+        const liquidateMillion = await this.contractService.getLiquidateMillion();
+        const obtainTotal = (marginAmount * liquidateMillion) / 10n ** 6n;
         if (liquidateIds.length > 0 && obtainTotal > 0) {
           console.log(
             `Found ${liquidateIds.length} liquidateIds positions in pool ${group.pool_id},obtainTotal:${obtainTotal}`
           );
 
           const minEtherPrice = getCurrencyMinEtherPrice(this.chainId, positions[0].margin_token);
-          const obtainAmount = (minEtherPrice * obtainTotal) / (10n ^ 18n);
+          const obtainAmount = (minEtherPrice * obtainTotal) / 10n ** 18n;
 
           const burnParams = {
             poolId: group.pool_id,
-            marginForOne: group.margin_for_one === 1,
+            marginForOne: marginForOne,
             positionIds: liquidateIds,
             signature: "0x",
           };
 
           try {
             const estimateGas = await this.contractService.estimateLiquidateBurn(burnParams);
-            if (estimateGas > obtainAmount) {
-              console.log(
-                `estimateGas > obtainAmount condition not met, estimateGas: ${estimateGas}, obtainAmount: ${obtainAmount}`
-              );
+            const txFee = await this.calculateTransactionFee(estimateGas);
+
+            if (txFee > obtainAmount) {
+              console.log(`Tx fee ${txFee} exceeds obtain amount ${obtainAmount}`);
               continue;
             }
             const tx = await this.contractService.liquidateBurn(burnParams);

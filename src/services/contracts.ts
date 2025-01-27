@@ -76,6 +76,10 @@ export class ContractService {
     return await this.contracts.marginChecker["checkLiquidate(address,uint256[])"](manager, positionIds);
   }
 
+  async getLiquidateMillion() {
+    return await this.contracts.marginChecker.getLiquidateMillion();
+  }
+
   // MarginHookManager
   async getHookStatus(poolId: string) {
     return await this.contracts.marginHookManager.getStatus(poolId);

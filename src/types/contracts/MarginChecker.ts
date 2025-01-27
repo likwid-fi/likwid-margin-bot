@@ -60,9 +60,13 @@ export interface MarginCheckerInterface extends Interface {
       | "checkLiquidate(address,uint256)"
       | "checkLiquidate(address,uint256[])"
       | "checkLiquidate(bytes32,bool,address,(bytes32,bool,uint128,uint128,uint128,uint128,uint256)[])"
+      | "getLeverageParts"
+      | "getLiquidateMillion"
       | "getMaxDecrease"
       | "getReserves"
       | "owner"
+      | "setLeverageParts"
+      | "setLiquidateMillion"
       | "transferOwnership"
   ): FunctionFragment;
 
@@ -93,6 +97,14 @@ export interface MarginCheckerInterface extends Interface {
     values: [BytesLike, boolean, AddressLike, MarginPositionStruct[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "getLeverageParts",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLiquidateMillion",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getMaxDecrease",
     values: [MarginPositionStruct, AddressLike]
   ): string;
@@ -101,6 +113,14 @@ export interface MarginCheckerInterface extends Interface {
     values: [BytesLike, boolean, AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "setLeverageParts",
+    values: [BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setLiquidateMillion",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
@@ -131,6 +151,14 @@ export interface MarginCheckerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getLeverageParts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLiquidateMillion",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getMaxDecrease",
     data: BytesLike
   ): Result;
@@ -139,6 +167,14 @@ export interface MarginCheckerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setLeverageParts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setLiquidateMillion",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -211,13 +247,13 @@ export interface MarginChecker extends BaseContract {
 
   "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)": TypedContractMethod<
     [_position: MarginPositionStruct, hook: AddressLike],
-    [[boolean, bigint] & { liquidated: boolean; amountDebt: bigint }],
+    [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
 
   "checkLiquidate(address,uint256)": TypedContractMethod<
     [manager: AddressLike, positionId: BigNumberish],
-    [[boolean, bigint] & { liquidated: boolean; releaseAmount: bigint }],
+    [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
 
@@ -226,7 +262,7 @@ export interface MarginChecker extends BaseContract {
     [
       [boolean[], bigint[]] & {
         liquidatedList: boolean[];
-        releaseAmountList: bigint[];
+        borrowAmountList: bigint[];
       }
     ],
     "view"
@@ -242,11 +278,15 @@ export interface MarginChecker extends BaseContract {
     [
       [boolean[], bigint[]] & {
         liquidatedList: boolean[];
-        amountDebtList: bigint[];
+        borrowAmountList: bigint[];
       }
     ],
     "view"
   >;
+
+  getLeverageParts: TypedContractMethod<[], [bigint[]], "view">;
+
+  getLiquidateMillion: TypedContractMethod<[], [bigint], "view">;
 
   getMaxDecrease: TypedContractMethod<
     [_position: MarginPositionStruct, hook: AddressLike],
@@ -261,6 +301,18 @@ export interface MarginChecker extends BaseContract {
   >;
 
   owner: TypedContractMethod<[], [string], "view">;
+
+  setLeverageParts: TypedContractMethod<
+    [_leverageParts: BigNumberish[]],
+    [void],
+    "nonpayable"
+  >;
+
+  setLiquidateMillion: TypedContractMethod<
+    [_liquidateMillion: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
@@ -286,14 +338,14 @@ export interface MarginChecker extends BaseContract {
     nameOrSignature: "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)"
   ): TypedContractMethod<
     [_position: MarginPositionStruct, hook: AddressLike],
-    [[boolean, bigint] & { liquidated: boolean; amountDebt: bigint }],
+    [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
   getFunction(
     nameOrSignature: "checkLiquidate(address,uint256)"
   ): TypedContractMethod<
     [manager: AddressLike, positionId: BigNumberish],
-    [[boolean, bigint] & { liquidated: boolean; releaseAmount: bigint }],
+    [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
   getFunction(
@@ -303,7 +355,7 @@ export interface MarginChecker extends BaseContract {
     [
       [boolean[], bigint[]] & {
         liquidatedList: boolean[];
-        releaseAmountList: bigint[];
+        borrowAmountList: bigint[];
       }
     ],
     "view"
@@ -320,11 +372,17 @@ export interface MarginChecker extends BaseContract {
     [
       [boolean[], bigint[]] & {
         liquidatedList: boolean[];
-        amountDebtList: bigint[];
+        borrowAmountList: bigint[];
       }
     ],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "getLeverageParts"
+  ): TypedContractMethod<[], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getLiquidateMillion"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "getMaxDecrease"
   ): TypedContractMethod<
@@ -342,6 +400,20 @@ export interface MarginChecker extends BaseContract {
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "setLeverageParts"
+  ): TypedContractMethod<
+    [_leverageParts: BigNumberish[]],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setLiquidateMillion"
+  ): TypedContractMethod<
+    [_liquidateMillion: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
