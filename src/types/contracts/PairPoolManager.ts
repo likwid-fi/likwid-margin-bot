@@ -27,8 +27,6 @@ export type AddLiquidityParamsStruct = {
   poolId: BytesLike;
   amount0: BigNumberish;
   amount1: BigNumberish;
-  tickLower: BigNumberish;
-  tickUpper: BigNumberish;
   level: BigNumberish;
   to: AddressLike;
   deadline: BigNumberish;
@@ -38,8 +36,6 @@ export type AddLiquidityParamsStructOutput = [
   poolId: string,
   amount0: bigint,
   amount1: bigint,
-  tickLower: bigint,
-  tickUpper: bigint,
   level: bigint,
   to: string,
   deadline: bigint
@@ -47,8 +43,6 @@ export type AddLiquidityParamsStructOutput = [
   poolId: string;
   amount0: bigint;
   amount1: bigint;
-  tickLower: bigint;
-  tickUpper: bigint;
   level: bigint;
   to: string;
   deadline: bigint;
@@ -76,49 +70,55 @@ export type PoolKeyStructOutput = [
   hooks: string;
 };
 
-export type HookStatusStruct = {
+export type PoolStatusStruct = {
+  blockTimestampLast: BigNumberish;
   realReserve0: BigNumberish;
   realReserve1: BigNumberish;
   mirrorReserve0: BigNumberish;
   mirrorReserve1: BigNumberish;
   marginFee: BigNumberish;
-  blockTimestampLast: BigNumberish;
-  interestRatio0X112: BigNumberish;
-  interestRatio1X112: BigNumberish;
+  lendingRealReserve0: BigNumberish;
+  lendingRealReserve1: BigNumberish;
+  lendingMirrorReserve0: BigNumberish;
+  lendingMirrorReserve1: BigNumberish;
+  truncatedReserve0: BigNumberish;
+  truncatedReserve1: BigNumberish;
   rate0CumulativeLast: BigNumberish;
   rate1CumulativeLast: BigNumberish;
-  marginTimestampLast: BigNumberish;
-  lastPrice1X112: BigNumberish;
   key: PoolKeyStruct;
 };
 
-export type HookStatusStructOutput = [
+export type PoolStatusStructOutput = [
+  blockTimestampLast: bigint,
   realReserve0: bigint,
   realReserve1: bigint,
   mirrorReserve0: bigint,
   mirrorReserve1: bigint,
   marginFee: bigint,
-  blockTimestampLast: bigint,
-  interestRatio0X112: bigint,
-  interestRatio1X112: bigint,
+  lendingRealReserve0: bigint,
+  lendingRealReserve1: bigint,
+  lendingMirrorReserve0: bigint,
+  lendingMirrorReserve1: bigint,
+  truncatedReserve0: bigint,
+  truncatedReserve1: bigint,
   rate0CumulativeLast: bigint,
   rate1CumulativeLast: bigint,
-  marginTimestampLast: bigint,
-  lastPrice1X112: bigint,
   key: PoolKeyStructOutput
 ] & {
+  blockTimestampLast: bigint;
   realReserve0: bigint;
   realReserve1: bigint;
   mirrorReserve0: bigint;
   mirrorReserve1: bigint;
   marginFee: bigint;
-  blockTimestampLast: bigint;
-  interestRatio0X112: bigint;
-  interestRatio1X112: bigint;
+  lendingRealReserve0: bigint;
+  lendingRealReserve1: bigint;
+  lendingMirrorReserve0: bigint;
+  lendingMirrorReserve1: bigint;
+  truncatedReserve0: bigint;
+  truncatedReserve1: bigint;
   rate0CumulativeLast: bigint;
   rate1CumulativeLast: bigint;
-  marginTimestampLast: bigint;
-  lastPrice1X112: bigint;
   key: PoolKeyStructOutput;
 };
 
@@ -127,10 +127,8 @@ export type MarginParamsStruct = {
   marginForOne: boolean;
   leverage: BigNumberish;
   marginAmount: BigNumberish;
-  marginTotal: BigNumberish;
   borrowAmount: BigNumberish;
-  borrowMinAmount: BigNumberish;
-  recipient: AddressLike;
+  borrowMaxAmount: BigNumberish;
   deadline: BigNumberish;
 };
 
@@ -139,27 +137,43 @@ export type MarginParamsStructOutput = [
   marginForOne: boolean,
   leverage: bigint,
   marginAmount: bigint,
-  marginTotal: bigint,
   borrowAmount: bigint,
-  borrowMinAmount: bigint,
-  recipient: string,
+  borrowMaxAmount: bigint,
   deadline: bigint
 ] & {
   poolId: string;
   marginForOne: boolean;
   leverage: bigint;
   marginAmount: bigint;
-  marginTotal: bigint;
   borrowAmount: bigint;
-  borrowMinAmount: bigint;
-  recipient: string;
+  borrowMaxAmount: bigint;
   deadline: bigint;
+};
+
+export type MarginParamsVoStruct = {
+  params: MarginParamsStruct;
+  marginTotal: BigNumberish;
+  minMarginLevel: BigNumberish;
+  marginCurrency: AddressLike;
+};
+
+export type MarginParamsVoStructOutput = [
+  params: MarginParamsStructOutput,
+  marginTotal: bigint,
+  minMarginLevel: bigint,
+  marginCurrency: string
+] & {
+  params: MarginParamsStructOutput;
+  marginTotal: bigint;
+  minMarginLevel: bigint;
+  marginCurrency: string;
 };
 
 export type ReleaseParamsStruct = {
   poolId: BytesLike;
   marginForOne: boolean;
   payer: AddressLike;
+  debtAmount: BigNumberish;
   repayAmount: BigNumberish;
   releaseAmount: BigNumberish;
   rawBorrowAmount: BigNumberish;
@@ -170,6 +184,7 @@ export type ReleaseParamsStructOutput = [
   poolId: string,
   marginForOne: boolean,
   payer: string,
+  debtAmount: bigint,
   repayAmount: bigint,
   releaseAmount: bigint,
   rawBorrowAmount: bigint,
@@ -178,6 +193,7 @@ export type ReleaseParamsStructOutput = [
   poolId: string;
   marginForOne: boolean;
   payer: string;
+  debtAmount: bigint;
   repayAmount: bigint;
   releaseAmount: bigint;
   rawBorrowAmount: bigint;
@@ -199,25 +215,6 @@ export type RemoveLiquidityParamsStructOutput = [
 ] & { poolId: string; level: bigint; liquidity: bigint; deadline: bigint };
 
 export declare namespace IPoolManager {
-  export type ModifyLiquidityParamsStruct = {
-    tickLower: BigNumberish;
-    tickUpper: BigNumberish;
-    liquidityDelta: BigNumberish;
-    salt: BytesLike;
-  };
-
-  export type ModifyLiquidityParamsStructOutput = [
-    tickLower: bigint,
-    tickUpper: bigint,
-    liquidityDelta: bigint,
-    salt: string
-  ] & {
-    tickLower: bigint;
-    tickUpper: bigint;
-    liquidityDelta: bigint;
-    salt: string;
-  };
-
   export type SwapParamsStruct = {
     zeroForOne: boolean;
     amountSpecified: BigNumberish;
@@ -235,102 +232,43 @@ export declare namespace IPoolManager {
   };
 }
 
-export declare namespace Hooks {
-  export type PermissionsStruct = {
-    beforeInitialize: boolean;
-    afterInitialize: boolean;
-    beforeAddLiquidity: boolean;
-    afterAddLiquidity: boolean;
-    beforeRemoveLiquidity: boolean;
-    afterRemoveLiquidity: boolean;
-    beforeSwap: boolean;
-    afterSwap: boolean;
-    beforeDonate: boolean;
-    afterDonate: boolean;
-    beforeSwapReturnDelta: boolean;
-    afterSwapReturnDelta: boolean;
-    afterAddLiquidityReturnDelta: boolean;
-    afterRemoveLiquidityReturnDelta: boolean;
-  };
-
-  export type PermissionsStructOutput = [
-    beforeInitialize: boolean,
-    afterInitialize: boolean,
-    beforeAddLiquidity: boolean,
-    afterAddLiquidity: boolean,
-    beforeRemoveLiquidity: boolean,
-    afterRemoveLiquidity: boolean,
-    beforeSwap: boolean,
-    afterSwap: boolean,
-    beforeDonate: boolean,
-    afterDonate: boolean,
-    beforeSwapReturnDelta: boolean,
-    afterSwapReturnDelta: boolean,
-    afterAddLiquidityReturnDelta: boolean,
-    afterRemoveLiquidityReturnDelta: boolean
-  ] & {
-    beforeInitialize: boolean;
-    afterInitialize: boolean;
-    beforeAddLiquidity: boolean;
-    afterAddLiquidity: boolean;
-    beforeRemoveLiquidity: boolean;
-    afterRemoveLiquidity: boolean;
-    beforeSwap: boolean;
-    afterSwap: boolean;
-    beforeDonate: boolean;
-    afterDonate: boolean;
-    beforeSwapReturnDelta: boolean;
-    afterSwapReturnDelta: boolean;
-    afterAddLiquidityReturnDelta: boolean;
-    afterRemoveLiquidityReturnDelta: boolean;
-  };
-}
-
-export interface MarginHookManagerInterface extends Interface {
+export interface PairPoolManagerInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "MINIMUM_LIQUIDITY"
-      | "ONE_BILLION"
-      | "ONE_MILLION"
-      | "SQRT_RATIO_1_1"
-      | "YEAR_SECONDS"
       | "addLiquidity"
       | "addPositionManager"
-      | "afterAddLiquidity"
-      | "afterDonate"
-      | "afterInitialize"
-      | "afterRemoveLiquidity"
-      | "afterSwap"
-      | "beforeAddLiquidity"
-      | "beforeDonate"
-      | "beforeInitialize"
-      | "beforeRemoveLiquidity"
-      | "beforeSwap"
+      | "collectProtocolFees"
       | "getAmountIn"
       | "getAmountOut"
-      | "getHookPermissions"
       | "getReserves"
       | "getStatus"
       | "handleAddLiquidity"
+      | "handleCollectFees"
       | "handleMargin"
       | "handleRelease"
       | "handleRemoveLiquidity"
-      | "hookStatusStore"
+      | "handleSwapMirror"
+      | "hooks"
       | "initialize"
-      | "kLast"
+      | "lendingPoolManager"
       | "margin"
       | "marginFees"
       | "marginLiquidity"
-      | "marginOracle"
+      | "mirrorInRealOut"
       | "mirrorTokenManager"
       | "owner"
       | "poolManager"
       | "positionManagers"
       | "release"
       | "removeLiquidity"
-      | "setFeeStatus"
+      | "removePositionManager"
+      | "setBalances"
+      | "setHooks"
       | "setMarginFees"
-      | "setMarginOracle"
+      | "setStatusManager"
+      | "statusManager"
+      | "swap"
+      | "swapMirror"
       | "transferOwnership"
       | "unlockCallback"
   ): FunctionFragment;
@@ -338,32 +276,13 @@ export interface MarginHookManagerInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "Burn"
+      | "Fees"
       | "Initialize"
       | "Mint"
       | "OwnershipTransferred"
-      | "Sync"
+      | "Release"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "MINIMUM_LIQUIDITY",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "ONE_BILLION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "ONE_MILLION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "SQRT_RATIO_1_1",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "YEAR_SECONDS",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "addLiquidity",
     values: [AddLiquidityParamsStruct]
@@ -373,79 +292,8 @@ export interface MarginHookManagerInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "afterAddLiquidity",
-    values: [
-      AddressLike,
-      PoolKeyStruct,
-      IPoolManager.ModifyLiquidityParamsStruct,
-      BigNumberish,
-      BigNumberish,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "afterDonate",
-    values: [AddressLike, PoolKeyStruct, BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "afterInitialize",
-    values: [AddressLike, PoolKeyStruct, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "afterRemoveLiquidity",
-    values: [
-      AddressLike,
-      PoolKeyStruct,
-      IPoolManager.ModifyLiquidityParamsStruct,
-      BigNumberish,
-      BigNumberish,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "afterSwap",
-    values: [
-      AddressLike,
-      PoolKeyStruct,
-      IPoolManager.SwapParamsStruct,
-      BigNumberish,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "beforeAddLiquidity",
-    values: [
-      AddressLike,
-      PoolKeyStruct,
-      IPoolManager.ModifyLiquidityParamsStruct,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "beforeDonate",
-    values: [AddressLike, PoolKeyStruct, BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "beforeInitialize",
-    values: [AddressLike, PoolKeyStruct, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "beforeRemoveLiquidity",
-    values: [
-      AddressLike,
-      PoolKeyStruct,
-      IPoolManager.ModifyLiquidityParamsStruct,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "beforeSwap",
-    values: [
-      AddressLike,
-      PoolKeyStruct,
-      IPoolManager.SwapParamsStruct,
-      BytesLike
-    ]
+    functionFragment: "collectProtocolFees",
+    values: [AddressLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getAmountIn",
@@ -454,10 +302,6 @@ export interface MarginHookManagerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getAmountOut",
     values: [BytesLike, boolean, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getHookPermissions",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getReserves",
@@ -472,29 +316,37 @@ export interface MarginHookManagerInterface extends Interface {
     values: [AddressLike, PoolKeyStruct, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "handleCollectFees",
+    values: [AddressLike, AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "handleMargin",
-    values: [AddressLike, MarginParamsStruct]
+    values: [AddressLike, AddressLike, PoolStatusStruct, MarginParamsVoStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "handleRelease",
-    values: [ReleaseParamsStruct]
+    values: [AddressLike, PoolStatusStruct, ReleaseParamsStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "handleRemoveLiquidity",
     values: [AddressLike, PoolKeyStruct, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "hookStatusStore",
-    values: [BytesLike]
+    functionFragment: "handleSwapMirror",
+    values: [AddressLike, AddressLike, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "hooks", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
     values: [PoolKeyStruct]
   ): string;
-  encodeFunctionData(functionFragment: "kLast", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "lendingPoolManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "margin",
-    values: [MarginParamsStruct]
+    values: [AddressLike, PoolStatusStruct, MarginParamsVoStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "marginFees",
@@ -505,8 +357,8 @@ export interface MarginHookManagerInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "marginOracle",
-    values?: undefined
+    functionFragment: "mirrorInRealOut",
+    values: [BytesLike, PoolStatusStruct, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "mirrorTokenManager",
@@ -523,23 +375,43 @@ export interface MarginHookManagerInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "release",
-    values: [ReleaseParamsStruct]
+    values: [AddressLike, PoolStatusStruct, ReleaseParamsStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "removeLiquidity",
     values: [RemoveLiquidityParamsStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "setFeeStatus",
-    values: [BytesLike, BigNumberish]
+    functionFragment: "removePositionManager",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setBalances",
+    values: [AddressLike, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setHooks",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setMarginFees",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "setMarginOracle",
+    functionFragment: "setStatusManager",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "statusManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "swap",
+    values: [AddressLike, PoolKeyStruct, IPoolManager.SwapParamsStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "swapMirror",
+    values: [AddressLike, AddressLike, BytesLike, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -551,26 +423,6 @@ export interface MarginHookManagerInterface extends Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "MINIMUM_LIQUIDITY",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "ONE_BILLION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "ONE_MILLION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "SQRT_RATIO_1_1",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "YEAR_SECONDS",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "addLiquidity",
     data: BytesLike
   ): Result;
@@ -579,39 +431,9 @@ export interface MarginHookManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "afterAddLiquidity",
+    functionFragment: "collectProtocolFees",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "afterDonate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "afterInitialize",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "afterRemoveLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "afterSwap", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "beforeAddLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "beforeDonate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "beforeInitialize",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "beforeRemoveLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "beforeSwap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getAmountIn",
     data: BytesLike
@@ -621,16 +443,16 @@ export interface MarginHookManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getHookPermissions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getReserves",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getStatus", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "handleAddLiquidity",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "handleCollectFees",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -646,11 +468,15 @@ export interface MarginHookManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "hookStatusStore",
+    functionFragment: "handleSwapMirror",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "hooks", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "kLast", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "lendingPoolManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "margin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "marginFees", data: BytesLike): Result;
   decodeFunctionResult(
@@ -658,7 +484,7 @@ export interface MarginHookManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "marginOracle",
+    functionFragment: "mirrorInRealOut",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -680,17 +506,28 @@ export interface MarginHookManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setFeeStatus",
+    functionFragment: "removePositionManager",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setBalances",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setHooks", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setMarginFees",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setMarginOracle",
+    functionFragment: "setStatusManager",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "statusManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "swapMirror", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -707,14 +544,16 @@ export namespace BurnEvent {
     sender: AddressLike,
     liquidity: BigNumberish,
     amount0: BigNumberish,
-    amount1: BigNumberish
+    amount1: BigNumberish,
+    level: BigNumberish
   ];
   export type OutputTuple = [
     poolId: string,
     sender: string,
     liquidity: bigint,
     amount0: bigint,
-    amount1: bigint
+    amount1: bigint,
+    level: bigint
   ];
   export interface OutputObject {
     poolId: string;
@@ -722,6 +561,35 @@ export namespace BurnEvent {
     liquidity: bigint;
     amount0: bigint;
     amount1: bigint;
+    level: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace FeesEvent {
+  export type InputTuple = [
+    poolId: BytesLike,
+    currency: AddressLike,
+    sender: AddressLike,
+    feeType: BigNumberish,
+    fee: BigNumberish
+  ];
+  export type OutputTuple = [
+    poolId: string,
+    currency: string,
+    sender: string,
+    feeType: bigint,
+    fee: bigint
+  ];
+  export interface OutputObject {
+    poolId: string;
+    currency: string;
+    sender: string;
+    feeType: bigint;
+    fee: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -767,7 +635,8 @@ export namespace MintEvent {
     to: AddressLike,
     liquidity: BigNumberish,
     amount0: BigNumberish,
-    amount1: BigNumberish
+    amount1: BigNumberish,
+    level: BigNumberish
   ];
   export type OutputTuple = [
     poolId: string,
@@ -775,7 +644,8 @@ export namespace MintEvent {
     to: string,
     liquidity: bigint,
     amount0: bigint,
-    amount1: bigint
+    amount1: bigint,
+    level: bigint
   ];
   export interface OutputObject {
     poolId: string;
@@ -784,6 +654,7 @@ export namespace MintEvent {
     liquidity: bigint;
     amount0: bigint;
     amount1: bigint;
+    level: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -804,27 +675,30 @@ export namespace OwnershipTransferredEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace SyncEvent {
+export namespace ReleaseEvent {
   export type InputTuple = [
     poolId: BytesLike,
-    realReserve0: BigNumberish,
-    realReserve1: BigNumberish,
-    mirrorReserve0: BigNumberish,
-    mirrorReserve1: BigNumberish
+    borrowCurrency: AddressLike,
+    debtAmount: BigNumberish,
+    repayAmount: BigNumberish,
+    burnAmount: BigNumberish,
+    rawBorrowAmount: BigNumberish
   ];
   export type OutputTuple = [
     poolId: string,
-    realReserve0: bigint,
-    realReserve1: bigint,
-    mirrorReserve0: bigint,
-    mirrorReserve1: bigint
+    borrowCurrency: string,
+    debtAmount: bigint,
+    repayAmount: bigint,
+    burnAmount: bigint,
+    rawBorrowAmount: bigint
   ];
   export interface OutputObject {
     poolId: string;
-    realReserve0: bigint;
-    realReserve1: bigint;
-    mirrorReserve0: bigint;
-    mirrorReserve1: bigint;
+    borrowCurrency: string;
+    debtAmount: bigint;
+    repayAmount: bigint;
+    burnAmount: bigint;
+    rawBorrowAmount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -832,11 +706,11 @@ export namespace SyncEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface MarginHookManager extends BaseContract {
-  connect(runner?: ContractRunner | null): MarginHookManager;
+export interface PairPoolManager extends BaseContract {
+  connect(runner?: ContractRunner | null): PairPoolManager;
   waitForDeployment(): Promise<this>;
 
-  interface: MarginHookManagerInterface;
+  interface: PairPoolManagerInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -875,16 +749,6 @@ export interface MarginHookManager extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  MINIMUM_LIQUIDITY: TypedContractMethod<[], [bigint], "view">;
-
-  ONE_BILLION: TypedContractMethod<[], [bigint], "view">;
-
-  ONE_MILLION: TypedContractMethod<[], [bigint], "view">;
-
-  SQRT_RATIO_1_1: TypedContractMethod<[], [bigint], "view">;
-
-  YEAR_SECONDS: TypedContractMethod<[], [bigint], "view">;
-
   addLiquidity: TypedContractMethod<
     [params: AddLiquidityParamsStruct],
     [bigint],
@@ -897,115 +761,9 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
 
-  afterAddLiquidity: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BigNumberish,
-      arg4: BigNumberish,
-      arg5: BytesLike
-    ],
-    [[string, bigint]],
-    "nonpayable"
-  >;
-
-  afterDonate: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike
-    ],
-    [string],
-    "nonpayable"
-  >;
-
-  afterInitialize: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: BigNumberish,
-      arg3: BigNumberish
-    ],
-    [string],
-    "nonpayable"
-  >;
-
-  afterRemoveLiquidity: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BigNumberish,
-      arg4: BigNumberish,
-      arg5: BytesLike
-    ],
-    [[string, bigint]],
-    "nonpayable"
-  >;
-
-  afterSwap: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.SwapParamsStruct,
-      arg3: BigNumberish,
-      arg4: BytesLike
-    ],
-    [[string, bigint]],
-    "nonpayable"
-  >;
-
-  beforeAddLiquidity: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BytesLike
-    ],
-    [string],
-    "view"
-  >;
-
-  beforeDonate: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike
-    ],
-    [string],
-    "nonpayable"
-  >;
-
-  beforeInitialize: TypedContractMethod<
-    [arg0: AddressLike, key: PoolKeyStruct, arg2: BigNumberish],
-    [string],
-    "view"
-  >;
-
-  beforeRemoveLiquidity: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BytesLike
-    ],
-    [string],
-    "nonpayable"
-  >;
-
-  beforeSwap: TypedContractMethod<
-    [
-      arg0: AddressLike,
-      key: PoolKeyStruct,
-      params: IPoolManager.SwapParamsStruct,
-      arg3: BytesLike
-    ],
-    [[string, bigint, bigint]],
+  collectProtocolFees: TypedContractMethod<
+    [recipient: AddressLike, currency: AddressLike, amount: BigNumberish],
+    [bigint],
     "nonpayable"
   >;
 
@@ -1021,12 +779,6 @@ export interface MarginHookManager extends BaseContract {
     "view"
   >;
 
-  getHookPermissions: TypedContractMethod<
-    [],
-    [Hooks.PermissionsStructOutput],
-    "view"
-  >;
-
   getReserves: TypedContractMethod<
     [poolId: BytesLike],
     [[bigint, bigint] & { _reserve0: bigint; _reserve1: bigint }],
@@ -1035,7 +787,7 @@ export interface MarginHookManager extends BaseContract {
 
   getStatus: TypedContractMethod<
     [poolId: BytesLike],
-    [HookStatusStructOutput],
+    [PoolStatusStructOutput],
     "view"
   >;
 
@@ -1050,14 +802,35 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
 
+  handleCollectFees: TypedContractMethod<
+    [recipient: AddressLike, currency: AddressLike, amount: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+
   handleMargin: TypedContractMethod<
-    [_positionManager: AddressLike, params: MarginParamsStruct],
-    [[bigint, bigint] & { marginWithoutFee: bigint; borrowAmount: bigint }],
+    [
+      _positionManager: AddressLike,
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      paramsVo: MarginParamsVoStruct
+    ],
+    [
+      [bigint, bigint, bigint] & {
+        marginAmount: bigint;
+        marginWithoutFee: bigint;
+        borrowAmount: bigint;
+      }
+    ],
     "nonpayable"
   >;
 
   handleRelease: TypedContractMethod<
-    [params: ReleaseParamsStruct],
+    [
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      params: ReleaseParamsStruct
+    ],
     [bigint],
     "nonpayable"
   >;
@@ -1073,57 +846,42 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
 
-  hookStatusStore: TypedContractMethod<
-    [arg0: BytesLike],
-    [
-      [
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        PoolKeyStructOutput
-      ] & {
-        realReserve0: bigint;
-        realReserve1: bigint;
-        mirrorReserve0: bigint;
-        mirrorReserve1: bigint;
-        marginFee: bigint;
-        blockTimestampLast: bigint;
-        interestRatio0X112: bigint;
-        interestRatio1X112: bigint;
-        rate0CumulativeLast: bigint;
-        rate1CumulativeLast: bigint;
-        marginTimestampLast: bigint;
-        lastPrice1X112: bigint;
-        key: PoolKeyStructOutput;
-      }
-    ],
-    "view"
+  handleSwapMirror: TypedContractMethod<
+    [sender: AddressLike, currency: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
   >;
+
+  hooks: TypedContractMethod<[], [string], "view">;
 
   initialize: TypedContractMethod<[key: PoolKeyStruct], [void], "nonpayable">;
 
-  kLast: TypedContractMethod<[], [bigint], "view">;
+  lendingPoolManager: TypedContractMethod<[], [string], "view">;
 
   margin: TypedContractMethod<
-    [params: MarginParamsStruct],
-    [MarginParamsStructOutput],
-    "nonpayable"
+    [
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      paramsVo: MarginParamsVoStruct
+    ],
+    [MarginParamsVoStructOutput],
+    "payable"
   >;
 
   marginFees: TypedContractMethod<[], [string], "view">;
 
   marginLiquidity: TypedContractMethod<[], [string], "view">;
 
-  marginOracle: TypedContractMethod<[], [string], "view">;
+  mirrorInRealOut: TypedContractMethod<
+    [
+      poolId: BytesLike,
+      status: PoolStatusStruct,
+      currency: AddressLike,
+      amount: BigNumberish
+    ],
+    [boolean],
+    "nonpayable"
+  >;
 
   mirrorTokenManager: TypedContractMethod<[], [string], "view">;
 
@@ -1134,7 +892,11 @@ export interface MarginHookManager extends BaseContract {
   positionManagers: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
   release: TypedContractMethod<
-    [params: ReleaseParamsStruct],
+    [
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      params: ReleaseParamsStruct
+    ],
     [bigint],
     "payable"
   >;
@@ -1145,11 +907,19 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
 
-  setFeeStatus: TypedContractMethod<
-    [poolId: BytesLike, _marginFee: BigNumberish],
+  removePositionManager: TypedContractMethod<
+    [_marginPositionManager: AddressLike],
     [void],
     "nonpayable"
   >;
+
+  setBalances: TypedContractMethod<
+    [sender: AddressLike, poolId: BytesLike],
+    [PoolStatusStructOutput],
+    "nonpayable"
+  >;
+
+  setHooks: TypedContractMethod<[_hooks: AddressLike], [void], "nonpayable">;
 
   setMarginFees: TypedContractMethod<
     [_marginFees: AddressLike],
@@ -1157,10 +927,42 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
 
-  setMarginOracle: TypedContractMethod<
-    [_oracle: AddressLike],
+  setStatusManager: TypedContractMethod<
+    [_poolStatusManager: AddressLike],
     [void],
     "nonpayable"
+  >;
+
+  statusManager: TypedContractMethod<[], [string], "view">;
+
+  swap: TypedContractMethod<
+    [
+      sender: AddressLike,
+      key: PoolKeyStruct,
+      params: IPoolManager.SwapParamsStruct
+    ],
+    [
+      [string, string, bigint, bigint, bigint] & {
+        specified: string;
+        unspecified: string;
+        specifiedAmount: bigint;
+        unspecifiedAmount: bigint;
+        swapFee: bigint;
+      }
+    ],
+    "nonpayable"
+  >;
+
+  swapMirror: TypedContractMethod<
+    [
+      sender: AddressLike,
+      recipient: AddressLike,
+      poolId: BytesLike,
+      zeroForOne: boolean,
+      amountIn: BigNumberish
+    ],
+    [bigint],
+    "payable"
   >;
 
   transferOwnership: TypedContractMethod<
@@ -1180,21 +982,6 @@ export interface MarginHookManager extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "MINIMUM_LIQUIDITY"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "ONE_BILLION"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "ONE_MILLION"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "SQRT_RATIO_1_1"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "YEAR_SECONDS"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
     nameOrSignature: "addLiquidity"
   ): TypedContractMethod<
     [params: AddLiquidityParamsStruct],
@@ -1209,125 +996,10 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "afterAddLiquidity"
+    nameOrSignature: "collectProtocolFees"
   ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BigNumberish,
-      arg4: BigNumberish,
-      arg5: BytesLike
-    ],
-    [[string, bigint]],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "afterDonate"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike
-    ],
-    [string],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "afterInitialize"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: BigNumberish,
-      arg3: BigNumberish
-    ],
-    [string],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "afterRemoveLiquidity"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BigNumberish,
-      arg4: BigNumberish,
-      arg5: BytesLike
-    ],
-    [[string, bigint]],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "afterSwap"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.SwapParamsStruct,
-      arg3: BigNumberish,
-      arg4: BytesLike
-    ],
-    [[string, bigint]],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "beforeAddLiquidity"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BytesLike
-    ],
-    [string],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "beforeDonate"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: BigNumberish,
-      arg3: BigNumberish,
-      arg4: BytesLike
-    ],
-    [string],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "beforeInitialize"
-  ): TypedContractMethod<
-    [arg0: AddressLike, key: PoolKeyStruct, arg2: BigNumberish],
-    [string],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "beforeRemoveLiquidity"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      arg1: PoolKeyStruct,
-      arg2: IPoolManager.ModifyLiquidityParamsStruct,
-      arg3: BytesLike
-    ],
-    [string],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "beforeSwap"
-  ): TypedContractMethod<
-    [
-      arg0: AddressLike,
-      key: PoolKeyStruct,
-      params: IPoolManager.SwapParamsStruct,
-      arg3: BytesLike
-    ],
-    [[string, bigint, bigint]],
+    [recipient: AddressLike, currency: AddressLike, amount: BigNumberish],
+    [bigint],
     "nonpayable"
   >;
   getFunction(
@@ -1345,9 +1017,6 @@ export interface MarginHookManager extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "getHookPermissions"
-  ): TypedContractMethod<[], [Hooks.PermissionsStructOutput], "view">;
-  getFunction(
     nameOrSignature: "getReserves"
   ): TypedContractMethod<
     [poolId: BytesLike],
@@ -1356,7 +1025,7 @@ export interface MarginHookManager extends BaseContract {
   >;
   getFunction(
     nameOrSignature: "getStatus"
-  ): TypedContractMethod<[poolId: BytesLike], [HookStatusStructOutput], "view">;
+  ): TypedContractMethod<[poolId: BytesLike], [PoolStatusStructOutput], "view">;
   getFunction(
     nameOrSignature: "handleAddLiquidity"
   ): TypedContractMethod<
@@ -1370,15 +1039,41 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "handleCollectFees"
+  ): TypedContractMethod<
+    [recipient: AddressLike, currency: AddressLike, amount: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "handleMargin"
   ): TypedContractMethod<
-    [_positionManager: AddressLike, params: MarginParamsStruct],
-    [[bigint, bigint] & { marginWithoutFee: bigint; borrowAmount: bigint }],
+    [
+      _positionManager: AddressLike,
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      paramsVo: MarginParamsVoStruct
+    ],
+    [
+      [bigint, bigint, bigint] & {
+        marginAmount: bigint;
+        marginWithoutFee: bigint;
+        borrowAmount: bigint;
+      }
+    ],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "handleRelease"
-  ): TypedContractMethod<[params: ReleaseParamsStruct], [bigint], "nonpayable">;
+  ): TypedContractMethod<
+    [
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      params: ReleaseParamsStruct
+    ],
+    [bigint],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "handleRemoveLiquidity"
   ): TypedContractMethod<
@@ -1392,54 +1087,31 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "hookStatusStore"
+    nameOrSignature: "handleSwapMirror"
   ): TypedContractMethod<
-    [arg0: BytesLike],
-    [
-      [
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        bigint,
-        PoolKeyStructOutput
-      ] & {
-        realReserve0: bigint;
-        realReserve1: bigint;
-        mirrorReserve0: bigint;
-        mirrorReserve1: bigint;
-        marginFee: bigint;
-        blockTimestampLast: bigint;
-        interestRatio0X112: bigint;
-        interestRatio1X112: bigint;
-        rate0CumulativeLast: bigint;
-        rate1CumulativeLast: bigint;
-        marginTimestampLast: bigint;
-        lastPrice1X112: bigint;
-        key: PoolKeyStructOutput;
-      }
-    ],
-    "view"
+    [sender: AddressLike, currency: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "hooks"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<[key: PoolKeyStruct], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "kLast"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "lendingPoolManager"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "margin"
   ): TypedContractMethod<
-    [params: MarginParamsStruct],
-    [MarginParamsStructOutput],
-    "nonpayable"
+    [
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      paramsVo: MarginParamsVoStruct
+    ],
+    [MarginParamsVoStructOutput],
+    "payable"
   >;
   getFunction(
     nameOrSignature: "marginFees"
@@ -1448,8 +1120,17 @@ export interface MarginHookManager extends BaseContract {
     nameOrSignature: "marginLiquidity"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "marginOracle"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: "mirrorInRealOut"
+  ): TypedContractMethod<
+    [
+      poolId: BytesLike,
+      status: PoolStatusStruct,
+      currency: AddressLike,
+      amount: BigNumberish
+    ],
+    [boolean],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "mirrorTokenManager"
   ): TypedContractMethod<[], [string], "view">;
@@ -1464,7 +1145,15 @@ export interface MarginHookManager extends BaseContract {
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "release"
-  ): TypedContractMethod<[params: ReleaseParamsStruct], [bigint], "payable">;
+  ): TypedContractMethod<
+    [
+      sender: AddressLike,
+      status: PoolStatusStruct,
+      params: ReleaseParamsStruct
+    ],
+    [bigint],
+    "payable"
+  >;
   getFunction(
     nameOrSignature: "removeLiquidity"
   ): TypedContractMethod<
@@ -1473,18 +1162,67 @@ export interface MarginHookManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "setFeeStatus"
+    nameOrSignature: "removePositionManager"
   ): TypedContractMethod<
-    [poolId: BytesLike, _marginFee: BigNumberish],
+    [_marginPositionManager: AddressLike],
     [void],
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setBalances"
+  ): TypedContractMethod<
+    [sender: AddressLike, poolId: BytesLike],
+    [PoolStatusStructOutput],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setHooks"
+  ): TypedContractMethod<[_hooks: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "setMarginFees"
   ): TypedContractMethod<[_marginFees: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "setMarginOracle"
-  ): TypedContractMethod<[_oracle: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "setStatusManager"
+  ): TypedContractMethod<
+    [_poolStatusManager: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "statusManager"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "swap"
+  ): TypedContractMethod<
+    [
+      sender: AddressLike,
+      key: PoolKeyStruct,
+      params: IPoolManager.SwapParamsStruct
+    ],
+    [
+      [string, string, bigint, bigint, bigint] & {
+        specified: string;
+        unspecified: string;
+        specifiedAmount: bigint;
+        unspecifiedAmount: bigint;
+        swapFee: bigint;
+      }
+    ],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "swapMirror"
+  ): TypedContractMethod<
+    [
+      sender: AddressLike,
+      recipient: AddressLike,
+      poolId: BytesLike,
+      zeroForOne: boolean,
+      amountIn: BigNumberish
+    ],
+    [bigint],
+    "payable"
+  >;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
@@ -1498,6 +1236,13 @@ export interface MarginHookManager extends BaseContract {
     BurnEvent.InputTuple,
     BurnEvent.OutputTuple,
     BurnEvent.OutputObject
+  >;
+  getEvent(
+    key: "Fees"
+  ): TypedContractEvent<
+    FeesEvent.InputTuple,
+    FeesEvent.OutputTuple,
+    FeesEvent.OutputObject
   >;
   getEvent(
     key: "Initialize"
@@ -1521,15 +1266,15 @@ export interface MarginHookManager extends BaseContract {
     OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
-    key: "Sync"
+    key: "Release"
   ): TypedContractEvent<
-    SyncEvent.InputTuple,
-    SyncEvent.OutputTuple,
-    SyncEvent.OutputObject
+    ReleaseEvent.InputTuple,
+    ReleaseEvent.OutputTuple,
+    ReleaseEvent.OutputObject
   >;
 
   filters: {
-    "Burn(bytes32,address,uint256,uint256,uint256)": TypedContractEvent<
+    "Burn(bytes32,address,uint256,uint256,uint256,uint8)": TypedContractEvent<
       BurnEvent.InputTuple,
       BurnEvent.OutputTuple,
       BurnEvent.OutputObject
@@ -1538,6 +1283,17 @@ export interface MarginHookManager extends BaseContract {
       BurnEvent.InputTuple,
       BurnEvent.OutputTuple,
       BurnEvent.OutputObject
+    >;
+
+    "Fees(bytes32,address,address,uint8,uint256)": TypedContractEvent<
+      FeesEvent.InputTuple,
+      FeesEvent.OutputTuple,
+      FeesEvent.OutputObject
+    >;
+    Fees: TypedContractEvent<
+      FeesEvent.InputTuple,
+      FeesEvent.OutputTuple,
+      FeesEvent.OutputObject
     >;
 
     "Initialize(bytes32,address,address,uint24,int24,address)": TypedContractEvent<
@@ -1551,7 +1307,7 @@ export interface MarginHookManager extends BaseContract {
       InitializeEvent.OutputObject
     >;
 
-    "Mint(bytes32,address,address,uint256,uint256,uint256)": TypedContractEvent<
+    "Mint(bytes32,address,address,uint256,uint256,uint256,uint8)": TypedContractEvent<
       MintEvent.InputTuple,
       MintEvent.OutputTuple,
       MintEvent.OutputObject
@@ -1573,15 +1329,15 @@ export interface MarginHookManager extends BaseContract {
       OwnershipTransferredEvent.OutputObject
     >;
 
-    "Sync(bytes32,uint256,uint256,uint256,uint256)": TypedContractEvent<
-      SyncEvent.InputTuple,
-      SyncEvent.OutputTuple,
-      SyncEvent.OutputObject
+    "Release(bytes32,address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      ReleaseEvent.InputTuple,
+      ReleaseEvent.OutputTuple,
+      ReleaseEvent.OutputObject
     >;
-    Sync: TypedContractEvent<
-      SyncEvent.InputTuple,
-      SyncEvent.OutputTuple,
-      SyncEvent.OutputObject
+    Release: TypedContractEvent<
+      ReleaseEvent.InputTuple,
+      ReleaseEvent.OutputTuple,
+      ReleaseEvent.OutputObject
     >;
   };
 }

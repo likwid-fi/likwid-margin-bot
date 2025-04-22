@@ -57,7 +57,7 @@ export class EventListener {
     if (this.isSyncing) return;
     this.isSyncing = true;
     try {
-      const hookManagerAddress = await this.contracts.marginHookManager.getAddress();
+      const hookManagerAddress = await this.contracts.pairPoolManager.getAddress();
       const positionManagerAddress = await this.contracts.marginPositionManager.getAddress();
       let lastSyncedBlock = this.db.getLastSyncedBlock(this.chainId);
       if (lastSyncedBlock === 0) {
@@ -65,7 +65,7 @@ export class EventListener {
       }
       const currentBlock = await this.provider.getBlockNumber();
       const batchSize = 1000;
-      const hookEvents = this.contracts.marginHookManager.interface;
+      const hookEvents = this.contracts.pairPoolManager.interface;
       const positionEvents = this.contracts.marginPositionManager.interface;
 
       const topics = [
@@ -89,7 +89,7 @@ export class EventListener {
         const events = await this.provider.getLogs(filter);
         for (const log of events) {
           if (log.address === hookManagerAddress) {
-            const parsedLog = this.contracts.marginHookManager.interface.parseLog({
+            const parsedLog = this.contracts.pairPoolManager.interface.parseLog({
               topics: log.topics,
               data: log.data,
             });
@@ -114,7 +114,7 @@ export class EventListener {
               const marginToken = parsedLog.args.marginForOne ? pool.currency1 : pool.currency0;
               console.log(marginToken, validateCurrency(this.chainId, marginToken));
               if (!validateCurrency(this.chainId, marginToken)) {
-                console.log("Jump", parsedLog.args.positionId, marginToken);
+                console.log("Pass position id:", parsedLog.args.positionId, "marginToken:", marginToken);
                 continue;
               }
               this.db.savePosition({

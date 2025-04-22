@@ -51,44 +51,13 @@ export type MarginPositionStructOutput = [
   rateCumulativeLast: bigint;
 };
 
-export type MarginPositionVoStruct = {
-  position: MarginPositionStruct;
-  pnl: BigNumberish;
-};
-
-export type MarginPositionVoStructOutput = [
-  position: MarginPositionStructOutput,
-  pnl: bigint
-] & { position: MarginPositionStructOutput; pnl: bigint };
-
-export type BurnParamsStruct = {
-  poolId: BytesLike;
-  marginForOne: boolean;
-  positionIds: BigNumberish[];
-  signature: BytesLike;
-};
-
-export type BurnParamsStructOutput = [
-  poolId: string,
-  marginForOne: boolean,
-  positionIds: bigint[],
-  signature: string
-] & {
-  poolId: string;
-  marginForOne: boolean;
-  positionIds: bigint[];
-  signature: string;
-};
-
 export type MarginParamsStruct = {
   poolId: BytesLike;
   marginForOne: boolean;
   leverage: BigNumberish;
   marginAmount: BigNumberish;
-  marginTotal: BigNumberish;
   borrowAmount: BigNumberish;
-  borrowMinAmount: BigNumberish;
-  recipient: AddressLike;
+  borrowMaxAmount: BigNumberish;
   deadline: BigNumberish;
 };
 
@@ -97,59 +66,43 @@ export type MarginParamsStructOutput = [
   marginForOne: boolean,
   leverage: bigint,
   marginAmount: bigint,
-  marginTotal: bigint,
   borrowAmount: bigint,
-  borrowMinAmount: bigint,
-  recipient: string,
+  borrowMaxAmount: bigint,
   deadline: bigint
 ] & {
   poolId: string;
   marginForOne: boolean;
   leverage: bigint;
   marginAmount: bigint;
-  marginTotal: bigint;
   borrowAmount: bigint;
-  borrowMinAmount: bigint;
-  recipient: string;
+  borrowMaxAmount: bigint;
   deadline: bigint;
 };
 
 export interface MarginPositionManagerInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "ONE_BILLION"
-      | "ONE_MILLION"
-      | "YEAR_SECONDS"
       | "approve"
       | "balanceOf"
       | "checker"
       | "close"
-      | "estimatePNL"
       | "getApproved"
-      | "getHook"
-      | "getMarginMax"
-      | "getMarginTotal"
-      | "getMaxDecrease"
       | "getPosition"
       | "getPositionId"
-      | "getPositions"
       | "isApprovedForAll"
-      | "liquidateBurn((bytes32,bool,uint256[],bytes))"
-      | "liquidateBurn(uint256,bytes)"
+      | "liquidateBurn"
       | "liquidateCall"
       | "margin"
-      | "minMarginLevel"
       | "modify"
       | "name"
       | "owner"
       | "ownerOf"
+      | "pairPoolManager"
       | "repay"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
-      | "setHook"
       | "setMarginChecker"
-      | "setMinMarginLevel"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
@@ -162,6 +115,7 @@ export interface MarginPositionManagerInterface extends Interface {
       | "Approval"
       | "ApprovalForAll"
       | "Burn"
+      | "CheckerChanged"
       | "Liquidate"
       | "Margin"
       | "Mint"
@@ -171,18 +125,6 @@ export interface MarginPositionManagerInterface extends Interface {
       | "Transfer"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "ONE_BILLION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "ONE_MILLION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "YEAR_SECONDS",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [AddressLike, BigNumberish]
@@ -197,24 +139,7 @@ export interface MarginPositionManagerInterface extends Interface {
     values: [BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "estimatePNL",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "getApproved",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "getHook", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "getMarginMax",
-    values: [BytesLike, boolean, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMarginTotal",
-    values: [BytesLike, boolean, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMaxDecrease",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -223,35 +148,23 @@ export interface MarginPositionManagerInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getPositionId",
-    values: [BytesLike, boolean, AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getPositions",
-    values: [BigNumberish[]]
+    values: [BytesLike, boolean, AddressLike, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "liquidateBurn((bytes32,bool,uint256[],bytes))",
-    values: [BurnParamsStruct]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "liquidateBurn(uint256,bytes)",
-    values: [BigNumberish, BytesLike]
+    functionFragment: "liquidateBurn",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "liquidateCall",
-    values: [BigNumberish, BytesLike]
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "margin",
     values: [MarginParamsStruct]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "minMarginLevel",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "modify",
@@ -262,6 +175,10 @@ export interface MarginPositionManagerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "pairPoolManager",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "repay",
@@ -280,16 +197,8 @@ export interface MarginPositionManagerInterface extends Interface {
     values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "setHook",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setMarginChecker",
     values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMinMarginLevel",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -309,41 +218,12 @@ export interface MarginPositionManagerInterface extends Interface {
     values: [AddressLike]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "ONE_BILLION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "ONE_MILLION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "YEAR_SECONDS",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "checker", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "close", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "estimatePNL",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getApproved",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getHook", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getMarginMax",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMarginTotal",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMaxDecrease",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -355,19 +235,11 @@ export interface MarginPositionManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getPositions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "liquidateBurn((bytes32,bool,uint256[],bytes))",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "liquidateBurn(uint256,bytes)",
+    functionFragment: "liquidateBurn",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -375,14 +247,14 @@ export interface MarginPositionManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "margin", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "minMarginLevel",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "modify", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pairPoolManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "repay", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256)",
@@ -396,13 +268,8 @@ export interface MarginPositionManagerInterface extends Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setHook", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setMarginChecker",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setMinMarginLevel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -486,6 +353,19 @@ export namespace BurnEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace CheckerChangedEvent {
+  export type InputTuple = [oldChecker: AddressLike, newChecker: AddressLike];
+  export type OutputTuple = [oldChecker: string, newChecker: string];
+  export interface OutputObject {
+    oldChecker: string;
+    newChecker: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace LiquidateEvent {
   export type InputTuple = [
     poolId: BytesLike,
@@ -493,7 +373,9 @@ export namespace LiquidateEvent {
     positionId: BigNumberish,
     marginAmount: BigNumberish,
     marginTotal: BigNumberish,
-    borrowAmount: BigNumberish
+    borrowAmount: BigNumberish,
+    oracleReserves: BigNumberish,
+    statusReserves: BigNumberish
   ];
   export type OutputTuple = [
     poolId: string,
@@ -501,7 +383,9 @@ export namespace LiquidateEvent {
     positionId: bigint,
     marginAmount: bigint,
     marginTotal: bigint,
-    borrowAmount: bigint
+    borrowAmount: bigint,
+    oracleReserves: bigint,
+    statusReserves: bigint
   ];
   export interface OutputObject {
     poolId: string;
@@ -510,6 +394,8 @@ export namespace LiquidateEvent {
     marginAmount: bigint;
     marginTotal: bigint;
     borrowAmount: bigint;
+    oracleReserves: bigint;
+    statusReserves: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -721,12 +607,6 @@ export interface MarginPositionManager extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  ONE_BILLION: TypedContractMethod<[], [bigint], "view">;
-
-  ONE_MILLION: TypedContractMethod<[], [bigint], "view">;
-
-  YEAR_SECONDS: TypedContractMethod<[], [bigint], "view">;
-
   approve: TypedContractMethod<
     [to: AddressLike, tokenId: BigNumberish],
     [void],
@@ -740,46 +620,15 @@ export interface MarginPositionManager extends BaseContract {
   close: TypedContractMethod<
     [
       positionId: BigNumberish,
-      repayMillionth: BigNumberish,
+      closeMillionth: BigNumberish,
       pnlMinAmount: BigNumberish,
       deadline: BigNumberish
     ],
     [void],
-    "payable"
-  >;
-
-  estimatePNL: TypedContractMethod<
-    [positionId: BigNumberish, repayMillionth: BigNumberish],
-    [bigint],
-    "view"
+    "nonpayable"
   >;
 
   getApproved: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
-
-  getHook: TypedContractMethod<[], [string], "view">;
-
-  getMarginMax: TypedContractMethod<
-    [poolId: BytesLike, marginForOne: boolean, leverage: BigNumberish],
-    [[bigint, bigint] & { marginMax: bigint; borrowAmount: bigint }],
-    "view"
-  >;
-
-  getMarginTotal: TypedContractMethod<
-    [
-      poolId: BytesLike,
-      marginForOne: boolean,
-      leverage: BigNumberish,
-      marginAmount: BigNumberish
-    ],
-    [[bigint, bigint] & { marginWithoutFee: bigint; borrowAmount: bigint }],
-    "view"
-  >;
-
-  getMaxDecrease: TypedContractMethod<
-    [positionId: BigNumberish],
-    [bigint],
-    "view"
-  >;
 
   getPosition: TypedContractMethod<
     [positionId: BigNumberish],
@@ -788,14 +637,13 @@ export interface MarginPositionManager extends BaseContract {
   >;
 
   getPositionId: TypedContractMethod<
-    [poolId: BytesLike, marginForOne: boolean, owner: AddressLike],
+    [
+      poolId: BytesLike,
+      marginForOne: boolean,
+      owner: AddressLike,
+      isMargin: boolean
+    ],
     [bigint],
-    "view"
-  >;
-
-  getPositions: TypedContractMethod<
-    [positionIds: BigNumberish[]],
-    [MarginPositionVoStructOutput[]],
     "view"
   >;
 
@@ -805,21 +653,15 @@ export interface MarginPositionManager extends BaseContract {
     "view"
   >;
 
-  "liquidateBurn((bytes32,bool,uint256[],bytes))": TypedContractMethod<
-    [params: BurnParamsStruct],
-    [bigint],
-    "nonpayable"
-  >;
-
-  "liquidateBurn(uint256,bytes)": TypedContractMethod<
-    [positionId: BigNumberish, signature: BytesLike],
-    [bigint],
+  liquidateBurn: TypedContractMethod<
+    [positionId: BigNumberish],
+    [[bigint, bigint] & { profit: bigint; repayAmount: bigint }],
     "nonpayable"
   >;
 
   liquidateCall: TypedContractMethod<
-    [positionId: BigNumberish, signature: BytesLike],
-    [bigint],
+    [positionId: BigNumberish],
+    [[bigint, bigint] & { profit: bigint; repayAmount: bigint }],
     "payable"
   >;
 
@@ -828,8 +670,6 @@ export interface MarginPositionManager extends BaseContract {
     [[bigint, bigint]],
     "payable"
   >;
-
-  minMarginLevel: TypedContractMethod<[], [bigint], "view">;
 
   modify: TypedContractMethod<
     [positionId: BigNumberish, changeAmount: BigNumberish],
@@ -842,6 +682,8 @@ export interface MarginPositionManager extends BaseContract {
   owner: TypedContractMethod<[], [string], "view">;
 
   ownerOf: TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+
+  pairPoolManager: TypedContractMethod<[], [string], "view">;
 
   repay: TypedContractMethod<
     [
@@ -876,16 +718,8 @@ export interface MarginPositionManager extends BaseContract {
     "nonpayable"
   >;
 
-  setHook: TypedContractMethod<[_hook: AddressLike], [void], "nonpayable">;
-
   setMarginChecker: TypedContractMethod<
     [_checker: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
-  setMinMarginLevel: TypedContractMethod<
-    [_minMarginLevel: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -917,15 +751,6 @@ export interface MarginPositionManager extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "ONE_BILLION"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "ONE_MILLION"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "YEAR_SECONDS"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
     nameOrSignature: "approve"
   ): TypedContractMethod<
     [to: AddressLike, tokenId: BigNumberish],
@@ -943,48 +768,16 @@ export interface MarginPositionManager extends BaseContract {
   ): TypedContractMethod<
     [
       positionId: BigNumberish,
-      repayMillionth: BigNumberish,
+      closeMillionth: BigNumberish,
       pnlMinAmount: BigNumberish,
       deadline: BigNumberish
     ],
     [void],
-    "payable"
-  >;
-  getFunction(
-    nameOrSignature: "estimatePNL"
-  ): TypedContractMethod<
-    [positionId: BigNumberish, repayMillionth: BigNumberish],
-    [bigint],
-    "view"
+    "nonpayable"
   >;
   getFunction(
     nameOrSignature: "getApproved"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
-  getFunction(
-    nameOrSignature: "getHook"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "getMarginMax"
-  ): TypedContractMethod<
-    [poolId: BytesLike, marginForOne: boolean, leverage: BigNumberish],
-    [[bigint, bigint] & { marginMax: bigint; borrowAmount: bigint }],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getMarginTotal"
-  ): TypedContractMethod<
-    [
-      poolId: BytesLike,
-      marginForOne: boolean,
-      leverage: BigNumberish,
-      marginAmount: BigNumberish
-    ],
-    [[bigint, bigint] & { marginWithoutFee: bigint; borrowAmount: bigint }],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getMaxDecrease"
-  ): TypedContractMethod<[positionId: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "getPosition"
   ): TypedContractMethod<
@@ -995,15 +788,13 @@ export interface MarginPositionManager extends BaseContract {
   getFunction(
     nameOrSignature: "getPositionId"
   ): TypedContractMethod<
-    [poolId: BytesLike, marginForOne: boolean, owner: AddressLike],
+    [
+      poolId: BytesLike,
+      marginForOne: boolean,
+      owner: AddressLike,
+      isMargin: boolean
+    ],
     [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getPositions"
-  ): TypedContractMethod<
-    [positionIds: BigNumberish[]],
-    [MarginPositionVoStructOutput[]],
     "view"
   >;
   getFunction(
@@ -1014,20 +805,17 @@ export interface MarginPositionManager extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "liquidateBurn((bytes32,bool,uint256[],bytes))"
-  ): TypedContractMethod<[params: BurnParamsStruct], [bigint], "nonpayable">;
-  getFunction(
-    nameOrSignature: "liquidateBurn(uint256,bytes)"
+    nameOrSignature: "liquidateBurn"
   ): TypedContractMethod<
-    [positionId: BigNumberish, signature: BytesLike],
-    [bigint],
+    [positionId: BigNumberish],
+    [[bigint, bigint] & { profit: bigint; repayAmount: bigint }],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "liquidateCall"
   ): TypedContractMethod<
-    [positionId: BigNumberish, signature: BytesLike],
-    [bigint],
+    [positionId: BigNumberish],
+    [[bigint, bigint] & { profit: bigint; repayAmount: bigint }],
     "payable"
   >;
   getFunction(
@@ -1037,9 +825,6 @@ export interface MarginPositionManager extends BaseContract {
     [[bigint, bigint]],
     "payable"
   >;
-  getFunction(
-    nameOrSignature: "minMarginLevel"
-  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "modify"
   ): TypedContractMethod<
@@ -1056,6 +841,9 @@ export interface MarginPositionManager extends BaseContract {
   getFunction(
     nameOrSignature: "ownerOf"
   ): TypedContractMethod<[tokenId: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "pairPoolManager"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "repay"
   ): TypedContractMethod<
@@ -1094,14 +882,8 @@ export interface MarginPositionManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "setHook"
-  ): TypedContractMethod<[_hook: AddressLike], [void], "nonpayable">;
-  getFunction(
     nameOrSignature: "setMarginChecker"
   ): TypedContractMethod<[_checker: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setMinMarginLevel"
-  ): TypedContractMethod<[_minMarginLevel: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "supportsInterface"
   ): TypedContractMethod<[interfaceId: BytesLike], [boolean], "view">;
@@ -1142,6 +924,13 @@ export interface MarginPositionManager extends BaseContract {
     BurnEvent.InputTuple,
     BurnEvent.OutputTuple,
     BurnEvent.OutputObject
+  >;
+  getEvent(
+    key: "CheckerChanged"
+  ): TypedContractEvent<
+    CheckerChangedEvent.InputTuple,
+    CheckerChangedEvent.OutputTuple,
+    CheckerChangedEvent.OutputObject
   >;
   getEvent(
     key: "Liquidate"
@@ -1227,7 +1016,18 @@ export interface MarginPositionManager extends BaseContract {
       BurnEvent.OutputObject
     >;
 
-    "Liquidate(bytes32,address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+    "CheckerChanged(address,address)": TypedContractEvent<
+      CheckerChangedEvent.InputTuple,
+      CheckerChangedEvent.OutputTuple,
+      CheckerChangedEvent.OutputObject
+    >;
+    CheckerChanged: TypedContractEvent<
+      CheckerChangedEvent.InputTuple,
+      CheckerChangedEvent.OutputTuple,
+      CheckerChangedEvent.OutputObject
+    >;
+
+    "Liquidate(bytes32,address,uint256,uint256,uint256,uint256,uint256,uint256)": TypedContractEvent<
       LiquidateEvent.InputTuple,
       LiquidateEvent.OutputTuple,
       LiquidateEvent.OutputObject

@@ -17,8 +17,9 @@ interface NetworkConfig {
   contracts: {
     startBlock: number;
     marginChecker: string;
-    marginHookManager: string;
+    pairPoolManager: string;
     marginPositionManager: string;
+    lendingPoolManager: string;
   };
   currencies: {
     [address: string]: {
@@ -48,8 +49,9 @@ export const config: Config = {
       contracts: {
         startBlock: 7461647,
         marginChecker: "0x27354b639DCBA5dC85343019367f3b494161aA48",
-        marginHookManager: "0x59036D328EFF4dAb2E33E04a60A5D810Df90C888",
+        pairPoolManager: "0x59036D328EFF4dAb2E33E04a60A5D810Df90C888",
         marginPositionManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
+        lendingPoolManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {
@@ -63,6 +65,26 @@ export const config: Config = {
         "0x8b099f91c710ce9e5ee5b7f2e83db9bac3378975": {
           name: "LIKWID",
           minEtherPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 LIKWID
+        },
+      },
+    },
+    97: {
+      rpcUrl: "https://bsc-testnet-rpc.publicnode.com",
+      contracts: {
+        startBlock: 50594712,
+        marginChecker: "0xD25Cf4015AB593aEa3989d9B4809f9Bf7e56A4fE",
+        pairPoolManager: "0xeA4330F7852b4D7a100E5F0C4A345A471CE2b34f",
+        marginPositionManager: "0x86E05FdB1Df8AA16975C64ca275e0e705483Eb79",
+        lendingPoolManager: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
+      },
+      currencies: {
+        "0x0000000000000000000000000000000000000000": {
+          name: "BHB",
+          minEtherPrice: ethers.parseEther("1"),
+        },
+        "0x664576b0abefb3068d7f80f560b05cf4d06cfb70": {
+          name: "LIKWID",
+          minEtherPrice: ethers.parseEther("0.000001"), // 1 ETH = 1000_000 LIKWID
         },
       },
     },

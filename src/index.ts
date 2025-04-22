@@ -2,13 +2,13 @@ import { DatabaseService } from "./services/database";
 import { EventListener } from "./services/eventListener";
 import { LiquidationWorker } from "./services/liquidationWorker";
 
-async function main() {
+async function main(chainId: number) {
   try {
     // init db
     const dbService = new DatabaseService();
 
     // init event listener
-    const chainId = 11155111; // Sepolia testnet
+    // const chainId = 11155111; // Sepolia testnet
     const eventListener = new EventListener(dbService, chainId);
     await eventListener.initialize();
 
@@ -49,8 +49,8 @@ async function main() {
     process.exit(1);
   }
 }
-
-main().catch((error) => {
+// bsc-testnet
+main(97).catch((error) => {
   console.error("Fatal error:", error);
   process.exit(1);
 });

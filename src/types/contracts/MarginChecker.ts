@@ -23,6 +23,80 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export type PoolKeyStruct = {
+  currency0: AddressLike;
+  currency1: AddressLike;
+  fee: BigNumberish;
+  tickSpacing: BigNumberish;
+  hooks: AddressLike;
+};
+
+export type PoolKeyStructOutput = [
+  currency0: string,
+  currency1: string,
+  fee: bigint,
+  tickSpacing: bigint,
+  hooks: string
+] & {
+  currency0: string;
+  currency1: string;
+  fee: bigint;
+  tickSpacing: bigint;
+  hooks: string;
+};
+
+export type PoolStatusStruct = {
+  blockTimestampLast: BigNumberish;
+  realReserve0: BigNumberish;
+  realReserve1: BigNumberish;
+  mirrorReserve0: BigNumberish;
+  mirrorReserve1: BigNumberish;
+  marginFee: BigNumberish;
+  lendingRealReserve0: BigNumberish;
+  lendingRealReserve1: BigNumberish;
+  lendingMirrorReserve0: BigNumberish;
+  lendingMirrorReserve1: BigNumberish;
+  truncatedReserve0: BigNumberish;
+  truncatedReserve1: BigNumberish;
+  rate0CumulativeLast: BigNumberish;
+  rate1CumulativeLast: BigNumberish;
+  key: PoolKeyStruct;
+};
+
+export type PoolStatusStructOutput = [
+  blockTimestampLast: bigint,
+  realReserve0: bigint,
+  realReserve1: bigint,
+  mirrorReserve0: bigint,
+  mirrorReserve1: bigint,
+  marginFee: bigint,
+  lendingRealReserve0: bigint,
+  lendingRealReserve1: bigint,
+  lendingMirrorReserve0: bigint,
+  lendingMirrorReserve1: bigint,
+  truncatedReserve0: bigint,
+  truncatedReserve1: bigint,
+  rate0CumulativeLast: bigint,
+  rate1CumulativeLast: bigint,
+  key: PoolKeyStructOutput
+] & {
+  blockTimestampLast: bigint;
+  realReserve0: bigint;
+  realReserve1: bigint;
+  mirrorReserve0: bigint;
+  mirrorReserve1: bigint;
+  marginFee: bigint;
+  lendingRealReserve0: bigint;
+  lendingRealReserve1: bigint;
+  lendingMirrorReserve0: bigint;
+  lendingMirrorReserve1: bigint;
+  truncatedReserve0: bigint;
+  truncatedReserve1: bigint;
+  rate0CumulativeLast: bigint;
+  rate1CumulativeLast: bigint;
+  key: PoolKeyStructOutput;
+};
+
 export type MarginPositionStruct = {
   poolId: BytesLike;
   marginForOne: boolean;
@@ -51,95 +125,188 @@ export type MarginPositionStructOutput = [
   rateCumulativeLast: bigint;
 };
 
+export type MarginPositionVoStruct = {
+  position: MarginPositionStruct;
+  pnl: BigNumberish;
+};
+
+export type MarginPositionVoStructOutput = [
+  position: MarginPositionStructOutput,
+  pnl: bigint
+] & { position: MarginPositionStructOutput; pnl: bigint };
+
 export interface MarginCheckerInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "ONE_MILLION"
-      | "checkLiquidate(address,uint256,bytes)"
-      | "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)"
       | "checkLiquidate(address,uint256)"
+      | "checkLiquidate(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))"
       | "checkLiquidate(address,uint256[])"
-      | "checkLiquidate(bytes32,bool,address,(bytes32,bool,uint128,uint128,uint128,uint128,uint256)[])"
-      | "getLeverageParts"
-      | "getLiquidateMillion"
-      | "getMaxDecrease"
+      | "checkMinMarginLevel"
+      | "checkValidity"
+      | "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)"
+      | "estimatePNL(address,uint256,uint256)"
+      | "getBorrowMax"
+      | "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)"
+      | "getLiquidateRepayAmount(address,uint256)"
+      | "getMarginMax"
+      | "getMaxDecrease(address,uint256)"
+      | "getMaxDecrease(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))"
+      | "getPositions"
+      | "getProfitMillions"
       | "getReserves"
+      | "getThousandthsByLeverage"
+      | "liquidationMarginLevel"
+      | "liquidationRatio"
+      | "minBorrowLevel"
+      | "minMarginLevel"
       | "owner"
+      | "setCallerProfit"
       | "setLeverageParts"
-      | "setLiquidateMillion"
+      | "setLiquidationMarginLevel"
+      | "setLiquidationRatio"
+      | "setMinBorrowLevel"
+      | "setMinMarginLevel"
+      | "setProtocolProfit"
       | "transferOwnership"
+      | "updatePosition"
   ): FunctionFragment;
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "ONE_MILLION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "checkLiquidate(address,uint256,bytes)",
-    values: [AddressLike, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)",
-    values: [MarginPositionStruct, AddressLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "checkLiquidate(address,uint256)",
     values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkLiquidate(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))",
+    values: [AddressLike, PoolStatusStruct, MarginPositionStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "checkLiquidate(address,uint256[])",
     values: [AddressLike, BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "checkLiquidate(bytes32,bool,address,(bytes32,bool,uint128,uint128,uint128,uint128,uint256)[])",
-    values: [BytesLike, boolean, AddressLike, MarginPositionStruct[]]
+    functionFragment: "checkMinMarginLevel",
+    values: [
+      PoolStatusStruct,
+      boolean,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getLeverageParts",
+    functionFragment: "checkValidity",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)",
+    values: [AddressLike, PoolStatusStruct, MarginPositionStruct, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "estimatePNL(address,uint256,uint256)",
+    values: [AddressLike, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getBorrowMax",
+    values: [AddressLike, BytesLike, boolean, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)",
+    values: [PoolStatusStruct, boolean, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLiquidateRepayAmount(address,uint256)",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMarginMax",
+    values: [AddressLike, BytesLike, boolean, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMaxDecrease(address,uint256)",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMaxDecrease(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))",
+    values: [AddressLike, PoolStatusStruct, MarginPositionStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPositions",
+    values: [AddressLike, BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getProfitMillions",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getLiquidateMillion",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMaxDecrease",
-    values: [MarginPositionStruct, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getReserves",
-    values: [BytesLike, boolean, AddressLike]
+    values: [AddressLike, BytesLike, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getThousandthsByLeverage",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "liquidationMarginLevel",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "liquidationRatio",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "minBorrowLevel",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "minMarginLevel",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "setCallerProfit",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "setLeverageParts",
     values: [BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "setLiquidateMillion",
+    functionFragment: "setLiquidationMarginLevel",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setLiquidationRatio",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMinBorrowLevel",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMinMarginLevel",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setProtocolProfit",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "updatePosition",
+    values: [AddressLike, MarginPositionStruct]
+  ): string;
 
   decodeFunctionResult(
-    functionFragment: "ONE_MILLION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "checkLiquidate(address,uint256,bytes)",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "checkLiquidate(address,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "checkLiquidate(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -147,36 +314,112 @@ export interface MarginCheckerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "checkLiquidate(bytes32,bool,address,(bytes32,bool,uint128,uint128,uint128,uint128,uint256)[])",
+    functionFragment: "checkMinMarginLevel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getLeverageParts",
+    functionFragment: "checkValidity",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getLiquidateMillion",
+    functionFragment: "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getMaxDecrease",
+    functionFragment: "estimatePNL(address,uint256,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getBorrowMax",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLiquidateRepayAmount(address,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMarginMax",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMaxDecrease(address,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMaxDecrease(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPositions",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getProfitMillions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getReserves",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getThousandthsByLeverage",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "liquidationMarginLevel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "liquidationRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "minBorrowLevel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "minMarginLevel",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setCallerProfit",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setLeverageParts",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setLiquidateMillion",
+    functionFragment: "setLiquidationMarginLevel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setLiquidationRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMinBorrowLevel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMinMarginLevel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setProtocolProfit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePosition",
     data: BytesLike
   ): Result;
 }
@@ -237,22 +480,18 @@ export interface MarginChecker extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  ONE_MILLION: TypedContractMethod<[], [bigint], "view">;
-
-  "checkLiquidate(address,uint256,bytes)": TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish, arg2: BytesLike],
-    [boolean],
-    "view"
-  >;
-
-  "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)": TypedContractMethod<
-    [_position: MarginPositionStruct, hook: AddressLike],
+  "checkLiquidate(address,uint256)": TypedContractMethod<
+    [manager: AddressLike, positionId: BigNumberish],
     [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
 
-  "checkLiquidate(address,uint256)": TypedContractMethod<
-    [manager: AddressLike, positionId: BigNumberish],
+  "checkLiquidate(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))": TypedContractMethod<
+    [
+      poolManager: AddressLike,
+      _status: PoolStatusStruct,
+      _position: MarginPositionStruct
+    ],
     [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
@@ -268,48 +507,163 @@ export interface MarginChecker extends BaseContract {
     "view"
   >;
 
-  "checkLiquidate(bytes32,bool,address,(bytes32,bool,uint128,uint128,uint128,uint128,uint256)[])": TypedContractMethod<
+  checkMinMarginLevel: TypedContractMethod<
     [
-      poolId: BytesLike,
+      _status: PoolStatusStruct,
       marginForOne: boolean,
-      hook: AddressLike,
-      inPositions: MarginPositionStruct[]
+      leverage: BigNumberish,
+      assetsAmount: BigNumberish,
+      debtAmount: BigNumberish
     ],
-    [
-      [boolean[], bigint[]] & {
-        liquidatedList: boolean[];
-        borrowAmountList: bigint[];
-      }
-    ],
+    [boolean],
     "view"
   >;
 
-  getLeverageParts: TypedContractMethod<[], [bigint[]], "view">;
+  checkValidity: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [boolean],
+    "view"
+  >;
 
-  getLiquidateMillion: TypedContractMethod<[], [bigint], "view">;
-
-  getMaxDecrease: TypedContractMethod<
-    [_position: MarginPositionStruct, hook: AddressLike],
+  "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)": TypedContractMethod<
+    [
+      pairPoolManager: AddressLike,
+      _status: PoolStatusStruct,
+      _position: MarginPositionStruct,
+      closeMillionth: BigNumberish
+    ],
     [bigint],
     "view"
   >;
 
+  "estimatePNL(address,uint256,uint256)": TypedContractMethod<
+    [
+      positionManager: AddressLike,
+      positionId: BigNumberish,
+      closeMillionth: BigNumberish
+    ],
+    [bigint],
+    "view"
+  >;
+
+  getBorrowMax: TypedContractMethod<
+    [
+      _poolManager: AddressLike,
+      poolId: BytesLike,
+      marginForOne: boolean,
+      marginAmount: BigNumberish
+    ],
+    [[bigint, bigint] & { marginAmountIn: bigint; borrowMax: bigint }],
+    "view"
+  >;
+
+  "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)": TypedContractMethod<
+    [
+      _status: PoolStatusStruct,
+      marginForOne: boolean,
+      assetsAmount: BigNumberish
+    ],
+    [bigint],
+    "view"
+  >;
+
+  "getLiquidateRepayAmount(address,uint256)": TypedContractMethod<
+    [manager: AddressLike, positionId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getMarginMax: TypedContractMethod<
+    [
+      _poolManager: AddressLike,
+      poolId: BytesLike,
+      marginForOne: boolean,
+      leverage: BigNumberish
+    ],
+    [[bigint, bigint] & { marginMax: bigint; borrowAmount: bigint }],
+    "view"
+  >;
+
+  "getMaxDecrease(address,uint256)": TypedContractMethod<
+    [positionManager: AddressLike, positionId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  "getMaxDecrease(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))": TypedContractMethod<
+    [
+      _poolManager: AddressLike,
+      _status: PoolStatusStruct,
+      _position: MarginPositionStruct
+    ],
+    [bigint],
+    "view"
+  >;
+
+  getPositions: TypedContractMethod<
+    [positionManager: AddressLike, positionIds: BigNumberish[]],
+    [MarginPositionVoStructOutput[]],
+    "view"
+  >;
+
+  getProfitMillions: TypedContractMethod<[], [[bigint, bigint]], "view">;
+
   getReserves: TypedContractMethod<
-    [poolId: BytesLike, marginForOne: boolean, hook: AddressLike],
+    [_poolManager: AddressLike, poolId: BytesLike, marginForOne: boolean],
     [[bigint, bigint] & { reserveBorrow: bigint; reserveMargin: bigint }],
     "view"
   >;
 
+  getThousandthsByLeverage: TypedContractMethod<[], [bigint[]], "view">;
+
+  liquidationMarginLevel: TypedContractMethod<[], [bigint], "view">;
+
+  liquidationRatio: TypedContractMethod<[], [bigint], "view">;
+
+  minBorrowLevel: TypedContractMethod<[], [bigint], "view">;
+
+  minMarginLevel: TypedContractMethod<[], [bigint], "view">;
+
   owner: TypedContractMethod<[], [string], "view">;
 
-  setLeverageParts: TypedContractMethod<
-    [_leverageParts: BigNumberish[]],
+  setCallerProfit: TypedContractMethod<
+    [_callerProfit: BigNumberish],
     [void],
     "nonpayable"
   >;
 
-  setLiquidateMillion: TypedContractMethod<
-    [_liquidateMillion: BigNumberish],
+  setLeverageParts: TypedContractMethod<
+    [_leverageThousandths: BigNumberish[]],
+    [void],
+    "nonpayable"
+  >;
+
+  setLiquidationMarginLevel: TypedContractMethod<
+    [_liquidationMarginLevel: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setLiquidationRatio: TypedContractMethod<
+    [_liquidationRatio: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setMinBorrowLevel: TypedContractMethod<
+    [_minBorrowLevel: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setMinMarginLevel: TypedContractMethod<
+    [_minMarginLevel: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setProtocolProfit: TypedContractMethod<
+    [_protocolProfit: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -320,31 +674,31 @@ export interface MarginChecker extends BaseContract {
     "nonpayable"
   >;
 
+  updatePosition: TypedContractMethod<
+    [positionManager: AddressLike, _position: MarginPositionStruct],
+    [MarginPositionStructOutput],
+    "view"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "ONE_MILLION"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "checkLiquidate(address,uint256,bytes)"
+    nameOrSignature: "checkLiquidate(address,uint256)"
   ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish, arg2: BytesLike],
-    [boolean],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "checkLiquidate((bytes32,bool,uint128,uint128,uint128,uint128,uint256),address)"
-  ): TypedContractMethod<
-    [_position: MarginPositionStruct, hook: AddressLike],
+    [manager: AddressLike, positionId: BigNumberish],
     [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
   getFunction(
-    nameOrSignature: "checkLiquidate(address,uint256)"
+    nameOrSignature: "checkLiquidate(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))"
   ): TypedContractMethod<
-    [manager: AddressLike, positionId: BigNumberish],
+    [
+      poolManager: AddressLike,
+      _status: PoolStatusStruct,
+      _position: MarginPositionStruct
+    ],
     [[boolean, bigint] & { liquidated: boolean; borrowAmount: bigint }],
     "view"
   >;
@@ -361,62 +715,186 @@ export interface MarginChecker extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "checkLiquidate(bytes32,bool,address,(bytes32,bool,uint128,uint128,uint128,uint128,uint256)[])"
+    nameOrSignature: "checkMinMarginLevel"
   ): TypedContractMethod<
     [
-      poolId: BytesLike,
+      _status: PoolStatusStruct,
       marginForOne: boolean,
-      hook: AddressLike,
-      inPositions: MarginPositionStruct[]
+      leverage: BigNumberish,
+      assetsAmount: BigNumberish,
+      debtAmount: BigNumberish
     ],
-    [
-      [boolean[], bigint[]] & {
-        liquidatedList: boolean[];
-        borrowAmountList: bigint[];
-      }
-    ],
+    [boolean],
     "view"
   >;
   getFunction(
-    nameOrSignature: "getLeverageParts"
-  ): TypedContractMethod<[], [bigint[]], "view">;
-  getFunction(
-    nameOrSignature: "getLiquidateMillion"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getMaxDecrease"
+    nameOrSignature: "checkValidity"
   ): TypedContractMethod<
-    [_position: MarginPositionStruct, hook: AddressLike],
+    [arg0: AddressLike, arg1: BigNumberish],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)"
+  ): TypedContractMethod<
+    [
+      pairPoolManager: AddressLike,
+      _status: PoolStatusStruct,
+      _position: MarginPositionStruct,
+      closeMillionth: BigNumberish
+    ],
     [bigint],
     "view"
   >;
   getFunction(
+    nameOrSignature: "estimatePNL(address,uint256,uint256)"
+  ): TypedContractMethod<
+    [
+      positionManager: AddressLike,
+      positionId: BigNumberish,
+      closeMillionth: BigNumberish
+    ],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getBorrowMax"
+  ): TypedContractMethod<
+    [
+      _poolManager: AddressLike,
+      poolId: BytesLike,
+      marginForOne: boolean,
+      marginAmount: BigNumberish
+    ],
+    [[bigint, bigint] & { marginAmountIn: bigint; borrowMax: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)"
+  ): TypedContractMethod<
+    [
+      _status: PoolStatusStruct,
+      marginForOne: boolean,
+      assetsAmount: BigNumberish
+    ],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getLiquidateRepayAmount(address,uint256)"
+  ): TypedContractMethod<
+    [manager: AddressLike, positionId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getMarginMax"
+  ): TypedContractMethod<
+    [
+      _poolManager: AddressLike,
+      poolId: BytesLike,
+      marginForOne: boolean,
+      leverage: BigNumberish
+    ],
+    [[bigint, bigint] & { marginMax: bigint; borrowAmount: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getMaxDecrease(address,uint256)"
+  ): TypedContractMethod<
+    [positionManager: AddressLike, positionId: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getMaxDecrease(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))"
+  ): TypedContractMethod<
+    [
+      _poolManager: AddressLike,
+      _status: PoolStatusStruct,
+      _position: MarginPositionStruct
+    ],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getPositions"
+  ): TypedContractMethod<
+    [positionManager: AddressLike, positionIds: BigNumberish[]],
+    [MarginPositionVoStructOutput[]],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getProfitMillions"
+  ): TypedContractMethod<[], [[bigint, bigint]], "view">;
+  getFunction(
     nameOrSignature: "getReserves"
   ): TypedContractMethod<
-    [poolId: BytesLike, marginForOne: boolean, hook: AddressLike],
+    [_poolManager: AddressLike, poolId: BytesLike, marginForOne: boolean],
     [[bigint, bigint] & { reserveBorrow: bigint; reserveMargin: bigint }],
     "view"
   >;
   getFunction(
+    nameOrSignature: "getThousandthsByLeverage"
+  ): TypedContractMethod<[], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "liquidationMarginLevel"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "liquidationRatio"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "minBorrowLevel"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "minMarginLevel"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "setCallerProfit"
+  ): TypedContractMethod<[_callerProfit: BigNumberish], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "setLeverageParts"
   ): TypedContractMethod<
-    [_leverageParts: BigNumberish[]],
+    [_leverageThousandths: BigNumberish[]],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "setLiquidateMillion"
+    nameOrSignature: "setLiquidationMarginLevel"
   ): TypedContractMethod<
-    [_liquidateMillion: BigNumberish],
+    [_liquidationMarginLevel: BigNumberish],
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "setLiquidationRatio"
+  ): TypedContractMethod<
+    [_liquidationRatio: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setMinBorrowLevel"
+  ): TypedContractMethod<[_minBorrowLevel: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setMinMarginLevel"
+  ): TypedContractMethod<[_minMarginLevel: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setProtocolProfit"
+  ): TypedContractMethod<[_protocolProfit: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "updatePosition"
+  ): TypedContractMethod<
+    [positionManager: AddressLike, _position: MarginPositionStruct],
+    [MarginPositionStructOutput],
+    "view"
+  >;
 
   getEvent(
     key: "OwnershipTransferred"
