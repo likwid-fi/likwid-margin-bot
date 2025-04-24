@@ -27,3 +27,7 @@ coverage/
 .cache/
 
 *.db
+
+# forge output
+out/
+cache/
