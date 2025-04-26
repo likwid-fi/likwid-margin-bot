@@ -10,6 +10,7 @@
     "build:dev": "npm run typechain && tsc",
     "lint": "eslint . --ext .ts",
     "test": "jest",
+    "test:dev": "ts-node-dev --transpile-only src/task/devTest.ts",
     "typechain": "typechain --target ethers-v6 --out-dir src/types/contracts src/abis/*.json"
   },
   "dependencies": {

@@ -31,3 +31,8 @@ coverage/
 # forge output
 out/
 cache/
+broadcast/LocalTests.s.sol
+
+# dev test
+script/LocalTests.s.sol
+src/task/devTest.ts
