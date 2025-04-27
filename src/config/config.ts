@@ -20,6 +20,7 @@ interface NetworkConfig {
     pairPoolManager: string;
     marginPositionManager: string;
     lendingPoolManager: string;
+    likwidPancakeswap: string;
   };
   currencies: {
     [address: string]: {
@@ -52,6 +53,7 @@ export const config: Config = {
         pairPoolManager: "0x59036D328EFF4dAb2E33E04a60A5D810Df90C888",
         marginPositionManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
         lendingPoolManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
+        likwidPancakeswap: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {
@@ -69,13 +71,35 @@ export const config: Config = {
       },
     },
     97: {
-      rpcUrl: "https://bsc-testnet-rpc.publicnode.com",
+      rpcUrl: "http://10.148.0.7:8545",
       contracts: {
         startBlock: 50594712,
         marginChecker: "0xD25Cf4015AB593aEa3989d9B4809f9Bf7e56A4fE",
         pairPoolManager: "0xeA4330F7852b4D7a100E5F0C4A345A471CE2b34f",
         marginPositionManager: "0x86E05FdB1Df8AA16975C64ca275e0e705483Eb79",
         lendingPoolManager: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
+        likwidPancakeswap: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
+      },
+      currencies: {
+        "0x0000000000000000000000000000000000000000": {
+          name: "BHB",
+          minEtherPrice: ethers.parseEther("1"),
+        },
+        "0x664576b0abefb3068d7f80f560b05cf4d06cfb70": {
+          name: "LIKWID",
+          minEtherPrice: ethers.parseEther("0.000001"), // 1 ETH = 1000_000 LIKWID
+        },
+      },
+    },
+    56: {
+      rpcUrl: "http://127.0.0.1:8545",
+      contracts: {
+        startBlock: 48725159,
+        marginChecker: "0x84f97Aa999bB9667685E77d1ea9873d061d29D89",
+        pairPoolManager: "0xe4449989D9504D1d734204222AeB543514974C1E",
+        marginPositionManager: "0x067fE343523fC82B387c08690CD874cF8b0dFD5C",
+        lendingPoolManager: "0xc19526A04EaCF64941D1Df8fe24c45033AD8253f",
+        likwidPancakeswap: "0x077740AC705E689B6e020D2BD51904182F82de3b",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {

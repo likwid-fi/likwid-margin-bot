@@ -18,6 +18,7 @@ export class LiquidationWorker {
   private isRunning: boolean = false;
   private chainId: number;
   private recipient: string = "";
+  private reconnectInterval: NodeJS.Timeout | null = null;
 
   constructor(db: DatabaseService, chainId: number) {
     this.db = db;
@@ -39,20 +40,19 @@ export class LiquidationWorker {
     if (this.isRunning) return;
     this.isRunning = true;
 
-    while (this.isRunning) {
-      try {
-        await this.liquidateBurn();
-        // sleep 10 seconds
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-      } catch (error) {
-        console.error("Error in liquidation check:", error);
-        await new Promise((resolve) => setTimeout(resolve, 30000));
+    this.reconnectInterval = setInterval(() => {
+      if (this.isRunning) {
+        this.liquidateBurn().catch((err) => console.error("liquidateBurn failed:", err));
       }
-    }
+    }, 10 * 1000);
   }
 
   stop() {
     this.isRunning = false;
+    if (this.reconnectInterval) {
+      clearInterval(this.reconnectInterval);
+      this.reconnectInterval = null;
+    }
   }
 
   private async calculateTransactionFee(estimateGas: bigint): Promise<bigint> {

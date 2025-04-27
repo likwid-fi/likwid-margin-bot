@@ -35,7 +35,7 @@ export class EventListener {
 
     this.reconnectInterval = setInterval(() => {
       if (this.isRunning) {
-        this.syncHistoricalEvents();
+        this.syncHistoricalEvents().catch((err) => console.error("syncHistoricalEvents failed:", err));
       }
     }, 10 * 1000);
 

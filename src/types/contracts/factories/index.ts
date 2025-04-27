@@ -3,6 +3,7 @@
 /* eslint-disable */
 export { ERC20__factory } from "./ERC20__factory";
 export { LendingPoolManager__factory } from "./LendingPoolManager__factory";
+export { LikwidPancakeswap__factory } from "./LikwidPancakeswap__factory";
 export { MarginChecker__factory } from "./MarginChecker__factory";
 export { MarginPositionManager__factory } from "./MarginPositionManager__factory";
 export { PairPoolManager__factory } from "./PairPoolManager__factory";

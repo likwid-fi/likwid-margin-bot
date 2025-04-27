@@ -19,6 +19,7 @@ async function main(chainId: number) {
     const liquidationWorker = new LiquidationWorker(dbService, chainId);
     await liquidationWorker.initialize();
     await liquidationWorker.start();
+    console.log("Started liquidationWorker...");
 
     // keep program running
     process.stdin.resume();
@@ -27,6 +28,9 @@ async function main(chainId: number) {
     const cleanup = async () => {
       console.log("\nStopping event listener...");
       eventListener.stopListening();
+      console.log("Stopping liquidationWorker...");
+      liquidationWorker.stop();
+      console.log("All stopped");
       // give some time for event listener to finish cleanup
       await new Promise((resolve) => setTimeout(resolve, 1000));
       process.exit(0);

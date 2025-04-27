@@ -7,12 +7,15 @@ import type { MarginChecker } from "../types/contracts/MarginChecker";
 import { MarginChecker__factory } from "../types/contracts/factories/MarginChecker__factory";
 import type { LendingPoolManager } from "../types/contracts/LendingPoolManager";
 import { LendingPoolManager__factory } from "../types/contracts/factories/LendingPoolManager__factory";
+import type { LikwidPancakeswap } from "../types/contracts/LikwidPancakeswap";
+import { LikwidPancakeswap__factory } from "../types/contracts/factories/LikwidPancakeswap__factory";
 
 export interface ContractAddresses {
   marginChecker: string;
   pairPoolManager: string;
   marginPositionManager: string;
   lendingPoolManager: string;
+  likwidPancakeswap: string;
 }
 
 export interface Contracts {
@@ -20,6 +23,7 @@ export interface Contracts {
   pairPoolManager: PairPoolManager;
   marginPositionManager: MarginPositionManager;
   lendingPoolManager: LendingPoolManager;
+  likwidPancakeswap: LikwidPancakeswap;
 }
 
 export async function initializeContracts(addresses: ContractAddresses, runner: ContractRunner): Promise<Contracts> {
@@ -31,11 +35,14 @@ export async function initializeContracts(addresses: ContractAddresses, runner: 
 
   const lendingPoolManager = LendingPoolManager__factory.connect(addresses.lendingPoolManager, runner);
 
+  const likwidPancakeswap = LikwidPancakeswap__factory.connect(addresses.likwidPancakeswap, runner);
+
   return {
     marginChecker,
     pairPoolManager,
     marginPositionManager,
     lendingPoolManager,
+    likwidPancakeswap,
   };
 }
 
