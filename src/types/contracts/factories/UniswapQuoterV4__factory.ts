@@ -4,9 +4,9 @@
 
 import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
-  UniswapV4Quoter,
-  UniswapV4QuoterInterface,
-} from "../UniswapV4Quoter";
+  UniswapQuoterV4,
+  UniswapQuoterV4Interface,
+} from "../UniswapQuoterV4";
 
 const _abi = [
   {
@@ -646,15 +646,15 @@ const _abi = [
   },
 ] as const;
 
-export class UniswapV4Quoter__factory {
+export class UniswapQuoterV4__factory {
   static readonly abi = _abi;
-  static createInterface(): UniswapV4QuoterInterface {
-    return new Interface(_abi) as UniswapV4QuoterInterface;
+  static createInterface(): UniswapQuoterV4Interface {
+    return new Interface(_abi) as UniswapQuoterV4Interface;
   }
   static connect(
     address: string,
     runner?: ContractRunner | null
-  ): UniswapV4Quoter {
-    return new Contract(address, _abi, runner) as unknown as UniswapV4Quoter;
+  ): UniswapQuoterV4 {
+    return new Contract(address, _abi, runner) as unknown as UniswapQuoterV4;
   }
 }

@@ -6,4 +6,5 @@ export { LendingPoolManager__factory } from "./LendingPoolManager__factory";
 export { MarginChecker__factory } from "./MarginChecker__factory";
 export { MarginPositionManager__factory } from "./MarginPositionManager__factory";
 export { PairPoolManager__factory } from "./PairPoolManager__factory";
-export { UniswapV4Quoter__factory } from "./UniswapV4Quoter__factory";
+export { PancakeswapQuoterV2__factory } from "./PancakeswapQuoterV2__factory";
+export { UniswapQuoterV4__factory } from "./UniswapQuoterV4__factory";

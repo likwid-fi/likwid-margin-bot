@@ -102,7 +102,7 @@ export declare namespace IV4Quoter {
   };
 }
 
-export interface UniswapV4QuoterInterface extends Interface {
+export interface UniswapQuoterV4Interface extends Interface {
   getFunction(
     nameOrSignature:
       | "_quoteExactInput"
@@ -200,11 +200,11 @@ export interface UniswapV4QuoterInterface extends Interface {
   ): Result;
 }
 
-export interface UniswapV4Quoter extends BaseContract {
-  connect(runner?: ContractRunner | null): UniswapV4Quoter;
+export interface UniswapQuoterV4 extends BaseContract {
+  connect(runner?: ContractRunner | null): UniswapQuoterV4;
   waitForDeployment(): Promise<this>;
 
-  interface: UniswapV4QuoterInterface;
+  interface: UniswapQuoterV4Interface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,

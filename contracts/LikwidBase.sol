@@ -5,14 +5,17 @@ import {IERC20} from "./external/IERC20.sol";
 import {SafeERC20} from "./external/SafeERC20.sol";
 import {Owned} from "./external/Owned.sol";
 import {IWrapNative} from "./interfaces/IWrapNative.sol";
+import {ILikwidRouter} from "./interfaces/likwid/ILikwidRouter.sol";
 
 contract LikwidBase is Owned {
     using SafeERC20 for IERC20;
 
     address public immutable wrapNative;
+    ILikwidRouter public immutable likwidRouter;
 
-    constructor(address initialOwner, address _wrapNative) Owned(initialOwner) {
+    constructor(address initialOwner, address _wrapNative, ILikwidRouter _likwidRouter) Owned(initialOwner) {
         wrapNative = _wrapNative;
+        likwidRouter = _likwidRouter;
     }
 
     function safeTransferETH(address to, uint256 amount) internal {
