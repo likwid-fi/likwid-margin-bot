@@ -41,10 +41,10 @@ export class ArbitrageWorker {
       console.log("Tasks finished successfully.");
     } catch (error) {
       console.error("Error during tasks execution:", error);
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await new Promise((resolve) => setTimeout(resolve, 30000));
     } finally {
       if (this.isRunning) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 10000));
         await this.runTasks();
       }
     }
