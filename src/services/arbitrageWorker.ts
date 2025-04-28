@@ -87,6 +87,7 @@ export class ArbitrageWorker {
       const balance = await this.provider.getBalance(likwidPancakeswap.getAddress());
       const sendValue = payValue > balance ? payValue - balance : 0;
       console.log("bnb2BTCB.likwidPancakeswap.balance:", balance, ";sendValue:", sendValue);
+      const returnBNBMin = payValue + gasAmount;
       if (likwidBTCB > pancakeswapResult.amountOut) {
         const cutCostAmount = (likwidBTCB * (ONE_MILLION - costPPI)) / ONE_MILLION;
         console.log("bnb2BTCB.likwidToPancakeswap.cutCostAmount:", cutCostAmount);
@@ -95,7 +96,7 @@ export class ArbitrageWorker {
           const pancakeBNB = (
             await this.contractService.pancakeswapQuoteExactInputSingleV2(btcb, wbnb, likwidOutMin, fee)
           ).amountOut;
-          if (pancakeBNB > payValue) {
+          if (pancakeBNB > returnBNBMin) {
             const tx = await likwidPancakeswap.likwidToPancakeswap(
               poolId,
               ethers.ZeroAddress,
@@ -103,14 +104,21 @@ export class ArbitrageWorker {
               fee,
               payValue,
               likwidOutMin,
-              payValue + gasAmount,
+              returnBNBMin,
               { value: sendValue }
             );
             console.log("bnb2BTCB.likwidToPancakeswap.tx.tx:", tx.hash);
             const receipt = await tx.wait();
             console.log("bnb2BTCB.likwidToPancakeswap.receipt.status:", receipt?.status);
           } else {
-            console.log("bnb2BTCB.pancakeswapToLikwid.likwidOutMin:", likwidOutMin, ";pancakeBNB:", pancakeBNB);
+            console.log(
+              "bnb2BTCB.pancakeswapToLikwid.likwidOutMin:",
+              likwidOutMin,
+              ";pancakeBNB:",
+              pancakeBNB,
+              ";returnBNBMin:",
+              returnBNBMin
+            );
           }
         }
       } else {
@@ -119,7 +127,8 @@ export class ArbitrageWorker {
         if (cutCostAmount >= likwidBTCB) {
           const pancakesOutMin = (pancakeswapResult.amountOut * (ONE_MILLION - 3000n)) / ONE_MILLION; // 0.3% slipping
           const likwidBNB = await this.contractService.getAmountOut(poolId, false, pancakesOutMin);
-          if (likwidBNB > payValue) {
+
+          if (likwidBNB > returnBNBMin) {
             const tx = await likwidPancakeswap.pancakeswapToLikwid(
               ethers.ZeroAddress,
               btcb,
@@ -127,14 +136,21 @@ export class ArbitrageWorker {
               poolId,
               payValue,
               pancakesOutMin,
-              payValue + gasAmount,
+              returnBNBMin,
               { value: sendValue }
             );
             console.log("bnb2BTCB.pancakeswapToLikwid.tx.tx:", tx.hash);
             const receipt = await tx.wait();
             console.log("bnb2BTCB.pancakeswapToLikwid.receipt.status:", receipt?.status);
           } else {
-            console.log("bnb2BTCB.pancakeswapToLikwid.pancakesOutMin:", pancakesOutMin, ";likwidBNB:", likwidBNB);
+            console.log(
+              "bnb2BTCB.pancakeswapToLikwid.pancakesOutMin:",
+              pancakesOutMin,
+              ";likwidBNB:",
+              likwidBNB,
+              ";returnBNBMin:",
+              returnBNBMin
+            );
           }
         }
       }
