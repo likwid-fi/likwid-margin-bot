@@ -1,0 +1,10 @@
+{
+  "apps": {
+    "name": "arbitrage", // app name
+    "script": "node", // exec name
+    "error_file": "./logs/arbitrage.error.log", // error log
+    "out_file": "./logs/arbitrage.log", // log
+    "log_date_format": "YYYY/MM/DD HH:mm:ss",
+    "args": ["--env-file=.env", "./dist/arbitrage.js"]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "apps": {
+    "name": "margin", // app name
+    "script": "node", // exec name
+    "error_file": "./logs/margin.error.log", // error log
+    "out_file": "./logs/margin.log", // log
+    "log_date_format": "YYYY/MM/DD HH:mm:ss",
+    "args": ["--env-file=.env", "./dist/index.js"]
+  }
+}
