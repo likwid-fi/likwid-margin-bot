@@ -37,7 +37,7 @@ export class ArbitrageWorker {
   async runTasks() {
     console.log("Tasks starting...");
     try {
-      await Promise.all([this.bnb2BTCB()]);
+      await Promise.all([this.bnb2BTCB(), this.bnb2SKYAI()]);
       console.log("Tasks finished successfully.");
     } catch (error) {
       console.error("Error during tasks execution:", error);
@@ -156,5 +156,103 @@ export class ArbitrageWorker {
       }
     }
     console.log("bnb2BTCB");
+  }
+
+  private async bnb2SKYAI() {
+    if (this.chainId == 56) {
+      console.log("bnb2SKYAI.chainId:", this.chainId);
+      const payValue = ethers.parseEther("0.1"); // 0.1 BNB
+      const poolId = "0x5b1a0326b66d3c3f9363e6a9fcf39535e7da5109ba1fe9405d3c8cff7ca46019";
+      const fee = 100n;
+      const wbnb = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
+      const skyai = "0x92aa03137385f18539301349dcfc9ebc923ffb10";
+      const [likwidSKYAI, pancakeswapResult] = await Promise.all([
+        this.contractService.getAmountOut(poolId, true, payValue),
+        this.contractService.pancakeswapQuoteExactInputSingleV2(wbnb, skyai, payValue, fee),
+      ]);
+      const totalGas = this.likwidSwapGas + pancakeswapResult.gasEstimate;
+      const gasAmount = await this.calculateTransactionFee(totalGas);
+      console.log(
+        "bnb2SKYAI.likwidSKYAI:",
+        likwidSKYAI,
+        ";pancakeswapResult.amountOut:",
+        pancakeswapResult.amountOut,
+        ";gasAmount:",
+        gasAmount
+      );
+      const costPPI = (gasAmount * ONE_MILLION) / payValue + 12000n; // 1.2% slipping
+      const likwidPancakeswap = this.contractService.getLikwidPancakeswap();
+      const balance = await this.provider.getBalance(likwidPancakeswap.getAddress());
+      const sendValue = payValue > balance ? payValue - balance : 0;
+      console.log("bnb2SKYAI.likwidPancakeswap.balance:", balance, ";sendValue:", sendValue);
+      const returnBNBMin = payValue + gasAmount;
+      if (likwidSKYAI > pancakeswapResult.amountOut) {
+        const cutCostAmount = (likwidSKYAI * (ONE_MILLION - costPPI)) / ONE_MILLION;
+        console.log("bnb2SKYAI.likwidToPancakeswap.cutCostAmount:", cutCostAmount);
+        if (cutCostAmount > pancakeswapResult.amountOut) {
+          const likwidOutMin = (likwidSKYAI * (ONE_MILLION - 3000n)) / ONE_MILLION; // 0.3% slipping
+          const pancakeBNB = (
+            await this.contractService.pancakeswapQuoteExactInputSingleV2(skyai, wbnb, likwidOutMin, fee)
+          ).amountOut;
+          if (pancakeBNB > returnBNBMin) {
+            const tx = await likwidPancakeswap.likwidToPancakeswap(
+              poolId,
+              ethers.ZeroAddress,
+              skyai,
+              fee,
+              payValue,
+              likwidOutMin,
+              returnBNBMin,
+              { value: sendValue }
+            );
+            console.log("bnb2SKYAI.likwidToPancakeswap.tx.tx:", tx.hash);
+            const receipt = await tx.wait();
+            console.log("bnb2SKYAI.likwidToPancakeswap.receipt.status:", receipt?.status);
+          } else {
+            console.log(
+              "bnb2SKYAI.pancakeswapToLikwid.likwidOutMin:",
+              likwidOutMin,
+              ";pancakeBNB:",
+              pancakeBNB,
+              ";returnBNBMin:",
+              returnBNBMin
+            );
+          }
+        }
+      } else {
+        const cutCostAmount = (pancakeswapResult.amountOut * (ONE_MILLION - costPPI)) / ONE_MILLION;
+        console.log("bnb2SKYAI.pancakeswapToLikwid.cutCostAmount:", cutCostAmount);
+        if (cutCostAmount >= likwidSKYAI) {
+          const pancakesOutMin = (pancakeswapResult.amountOut * (ONE_MILLION - 3000n)) / ONE_MILLION; // 0.3% slipping
+          const likwidBNB = await this.contractService.getAmountOut(poolId, false, pancakesOutMin);
+
+          if (likwidBNB > returnBNBMin) {
+            const tx = await likwidPancakeswap.pancakeswapToLikwid(
+              ethers.ZeroAddress,
+              skyai,
+              fee,
+              poolId,
+              payValue,
+              pancakesOutMin,
+              returnBNBMin,
+              { value: sendValue }
+            );
+            console.log("bnb2SKYAI.pancakeswapToLikwid.tx.tx:", tx.hash);
+            const receipt = await tx.wait();
+            console.log("bnb2SKYAI.pancakeswapToLikwid.receipt.status:", receipt?.status);
+          } else {
+            console.log(
+              "bnb2SKYAI.pancakeswapToLikwid.pancakesOutMin:",
+              pancakesOutMin,
+              ";likwidBNB:",
+              likwidBNB,
+              ";returnBNBMin:",
+              returnBNBMin
+            );
+          }
+        }
+      }
+    }
+    console.log("bnb2SKYAI");
   }
 }
