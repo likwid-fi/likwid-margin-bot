@@ -82,7 +82,7 @@ export class ArbitrageWorker {
         ";gasAmount:",
         gasAmount
       );
-      const costPPI = (gasAmount * ONE_MILLION) / payValue + 10000n;
+      const costPPI = (gasAmount * ONE_MILLION) / payValue + 12000n; // 1.2% slipping
       const likwidPancakeswap = this.contractService.getLikwidPancakeswap();
       const balance = await this.provider.getBalance(likwidPancakeswap.getAddress());
       const sendValue = payValue > balance ? payValue - balance : 0;
@@ -103,7 +103,7 @@ export class ArbitrageWorker {
               fee,
               payValue,
               likwidOutMin,
-              payValue,
+              payValue + gasAmount,
               { value: sendValue }
             );
             console.log("bnb2BTCB.likwidToPancakeswap.tx.tx:", tx.hash);
@@ -127,7 +127,7 @@ export class ArbitrageWorker {
               poolId,
               payValue,
               pancakesOutMin,
-              payValue,
+              payValue + gasAmount,
               { value: sendValue }
             );
             console.log("bnb2BTCB.pancakeswapToLikwid.tx.tx:", tx.hash);

@@ -95,7 +95,8 @@ export const config: Config = {
       },
     },
     56: {
-      rpcUrl: "http://127.0.0.1:8545",
+      // BSC_MAINNET
+      rpcUrl: requireEnv("BSC_MAINNET_RPC"),
       contracts: {
         startBlock: 48725159,
         marginChecker: "0x84f97Aa999bB9667685E77d1ea9873d061d29D89",

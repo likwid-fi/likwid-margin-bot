@@ -26,11 +26,12 @@ import type {
 export interface LikwidPancakeswapInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "callers"
       | "likwidRouter"
       | "likwidToPancakeswap"
       | "owner"
       | "pancakeswapToLikwid"
-      | "swapV3"
+      | "swap"
       | "transferOwnership"
       | "universalRouter"
       | "withdraw"
@@ -39,6 +40,10 @@ export interface LikwidPancakeswapInterface extends Interface {
 
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "callers",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "likwidRouter",
     values?: undefined
@@ -69,7 +74,7 @@ export interface LikwidPancakeswapInterface extends Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "swapV3",
+    functionFragment: "swap",
     values: [AddressLike, AddressLike, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -89,6 +94,7 @@ export interface LikwidPancakeswapInterface extends Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(functionFragment: "callers", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "likwidRouter",
     data: BytesLike
@@ -102,7 +108,7 @@ export interface LikwidPancakeswapInterface extends Interface {
     functionFragment: "pancakeswapToLikwid",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "swapV3", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "swap", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
@@ -171,6 +177,8 @@ export interface LikwidPancakeswap extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  callers: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+
   likwidRouter: TypedContractMethod<[], [string], "view">;
 
   likwidToPancakeswap: TypedContractMethod<
@@ -203,7 +211,7 @@ export interface LikwidPancakeswap extends BaseContract {
     "payable"
   >;
 
-  swapV3: TypedContractMethod<
+  swap: TypedContractMethod<
     [
       tokenIn: AddressLike,
       tokenOut: AddressLike,
@@ -235,6 +243,9 @@ export interface LikwidPancakeswap extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "callers"
+  ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "likwidRouter"
   ): TypedContractMethod<[], [string], "view">;
@@ -272,7 +283,7 @@ export interface LikwidPancakeswap extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "swapV3"
+    nameOrSignature: "swap"
   ): TypedContractMethod<
     [
       tokenIn: AddressLike,

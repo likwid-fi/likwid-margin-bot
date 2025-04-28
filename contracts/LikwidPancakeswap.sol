@@ -22,7 +22,7 @@ contract LikwidPancakeswap is LikwidBase {
         universalRouter = router;
     }
 
-    function _swapV3(address tokenIn, address tokenOut, uint24 fee, uint256 amountIn, uint256 amountOutMin)
+    function _swap(address tokenIn, address tokenOut, uint24 fee, uint256 amountIn, uint256 amountOutMin)
         internal
         returns (uint256 amountOut)
     {
@@ -37,10 +37,20 @@ contract LikwidPancakeswap is LikwidBase {
         }
         require(_tokenIn != _tokenOut, "PAIR_ERROR");
         uint256 startBalance = IERC20(_tokenOut).balanceOf(address(this));
-        bytes memory commands = abi.encodePacked(bytes1(uint8(Commands.V3_SWAP_EXACT_IN)));
-        bytes memory path = abi.encodePacked(_tokenIn, fee, _tokenOut);
+        bytes memory commands;
         bytes[] memory inputs = new bytes[](1);
-        inputs[0] = abi.encode(ActionConstants.MSG_SENDER, amountIn, amountOutMin, path, false);
+        if (fee > 0) {
+            commands = abi.encodePacked(bytes1(uint8(Commands.V3_SWAP_EXACT_IN)));
+            bytes memory path = abi.encodePacked(_tokenIn, fee, _tokenOut);
+            inputs[0] = abi.encode(ActionConstants.MSG_SENDER, amountIn, amountOutMin, path, false);
+        } else {
+            commands = abi.encodePacked(bytes1(uint8(Commands.V2_SWAP_EXACT_IN)));
+            address[] memory path = new address[](2);
+            path[0] = _tokenIn;
+            path[1] = _tokenOut;
+            inputs[0] = abi.encode(ActionConstants.MSG_SENDER, amountIn, amountOutMin, path, false);
+        }
+
         IERC20(_tokenIn).safeTransfer(address(universalRouter), amountIn);
         universalRouter.execute(commands, inputs, block.timestamp + 100);
         amountOut = IERC20(_tokenOut).balanceOf(address(this)) - startBalance;
@@ -50,13 +60,13 @@ contract LikwidPancakeswap is LikwidBase {
         _withdraw(tokenOut, amountOut);
     }
 
-    function swapV3(address tokenIn, address tokenOut, uint24 fee, uint256 amountIn, uint256 amountOutMin)
+    function swap(address tokenIn, address tokenOut, uint24 fee, uint256 amountIn, uint256 amountOutMin)
         external
         payable
         onlyCaller
         returns (uint256 amountOut)
     {
-        amountOut = _swapV3(tokenIn, tokenOut, fee, amountIn, amountOutMin);
+        amountOut = _swap(tokenIn, tokenOut, fee, amountIn, amountOutMin);
     }
 
     function likwidToPancakeswap(
@@ -84,7 +94,7 @@ contract LikwidPancakeswap is LikwidBase {
             IERC20(tokenIn).forceApprove(address(likwidRouter), likwidIn);
         }
         likwidOut = likwidRouter.exactInput{value: sendValue}(swapParams);
-        pancakesOut = _swapV3(tokenOut, tokenIn, fee, likwidOut, pancakesOutMin);
+        pancakesOut = _swap(tokenOut, tokenIn, fee, likwidOut, pancakesOutMin);
         if (pancakesOutMin > 0) {
             require(pancakesOut >= pancakesOutMin, "InsufficientPancakesOutMin");
         }
@@ -99,7 +109,7 @@ contract LikwidPancakeswap is LikwidBase {
         uint256 pancakesOutMin,
         uint256 likwidOutMin
     ) external payable onlyCaller returns (uint256 pancakesOut, uint256 likwidOut) {
-        pancakesOut = _swapV3(tokenIn, tokenOut, fee, pancakesIn, pancakesOutMin);
+        pancakesOut = _swap(tokenIn, tokenOut, fee, pancakesIn, pancakesOutMin);
         uint256 sendValue;
         if (tokenOut == address(0)) {
             sendValue = pancakesOut;
