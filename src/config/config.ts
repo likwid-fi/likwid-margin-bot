@@ -98,22 +98,22 @@ export const config: Config = {
       // BSC_MAINNET
       rpcUrl: requireEnv("BSC_MAINNET_RPC"),
       contracts: {
-        startBlock: 48725159,
-        marginChecker: "0x84f97Aa999bB9667685E77d1ea9873d061d29D89",
-        pairPoolManager: "0xe4449989D9504D1d734204222AeB543514974C1E",
-        marginPositionManager: "0x067fE343523fC82B387c08690CD874cF8b0dFD5C",
-        lendingPoolManager: "0xc19526A04EaCF64941D1Df8fe24c45033AD8253f",
-        likwidPancakeswap: "0x077740AC705E689B6e020D2BD51904182F82de3b",
+        startBlock: 48750048,
+        marginChecker: "0xcBd4086E29928E2538b1DbdA803D44F0F078aF16",
+        lendingPoolManager: "0xACE4b5572CAab534d611AfE413fDE5E23Baef6fd",
+        pairPoolManager: "0x947FB7c0aA370E741DaE9927680bB3714Ca745EC",
+        marginPositionManager: "0x6170bEd496E83136e60ADcbe539226a4b9c67Ad5",
+        likwidPancakeswap: "0x9DB31f99c4e0a8fAE8F6B3f2C57E785436348EFc",
         pancakeswapQuoterV2: "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {
-          name: "BHB",
+          name: "BNB",
           minEtherPrice: ethers.parseEther("1"),
         },
-        "0x664576b0abefb3068d7f80f560b05cf4d06cfb70": {
-          name: "LIKWID",
-          minEtherPrice: ethers.parseEther("0.000001"), // 1 ETH = 1000_000 LIKWID
+        "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c": {
+          name: "BTCB",
+          minEtherPrice: ethers.parseEther("156.207"), // 1 BNB = 0.006392 BTCB
         },
       },
     },
