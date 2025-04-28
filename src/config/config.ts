@@ -21,6 +21,7 @@ interface NetworkConfig {
     marginPositionManager: string;
     lendingPoolManager: string;
     likwidPancakeswap: string;
+    pancakeswapQuoterV2: string;
   };
   currencies: {
     [address: string]: {
@@ -54,6 +55,7 @@ export const config: Config = {
         marginPositionManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
         lendingPoolManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
         likwidPancakeswap: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
+        pancakeswapQuoterV2: "",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {
@@ -79,6 +81,7 @@ export const config: Config = {
         marginPositionManager: "0x86E05FdB1Df8AA16975C64ca275e0e705483Eb79",
         lendingPoolManager: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
         likwidPancakeswap: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
+        pancakeswapQuoterV2: "",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {
@@ -100,6 +103,7 @@ export const config: Config = {
         marginPositionManager: "0x067fE343523fC82B387c08690CD874cF8b0dFD5C",
         lendingPoolManager: "0xc19526A04EaCF64941D1Df8fe24c45033AD8253f",
         likwidPancakeswap: "0x077740AC705E689B6e020D2BD51904182F82de3b",
+        pancakeswapQuoterV2: "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997",
       },
       currencies: {
         "0x0000000000000000000000000000000000000000": {

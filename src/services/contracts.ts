@@ -9,6 +9,8 @@ import type { LendingPoolManager } from "../types/contracts/LendingPoolManager";
 import { LendingPoolManager__factory } from "../types/contracts/factories/LendingPoolManager__factory";
 import type { LikwidPancakeswap } from "../types/contracts/LikwidPancakeswap";
 import { LikwidPancakeswap__factory } from "../types/contracts/factories/LikwidPancakeswap__factory";
+import type { PancakeswapQuoterV2, IQuoterV2 } from "../types/contracts/PancakeswapQuoterV2";
+import { PancakeswapQuoterV2__factory } from "../types/contracts/factories/PancakeswapQuoterV2__factory";
 
 export interface ContractAddresses {
   marginChecker: string;
@@ -16,6 +18,7 @@ export interface ContractAddresses {
   marginPositionManager: string;
   lendingPoolManager: string;
   likwidPancakeswap: string;
+  pancakeswapQuoterV2: string;
 }
 
 export interface Contracts {
@@ -24,6 +27,7 @@ export interface Contracts {
   marginPositionManager: MarginPositionManager;
   lendingPoolManager: LendingPoolManager;
   likwidPancakeswap: LikwidPancakeswap;
+  pancakeswapQuoterV2: PancakeswapQuoterV2;
 }
 
 export async function initializeContracts(addresses: ContractAddresses, runner: ContractRunner): Promise<Contracts> {
@@ -37,12 +41,15 @@ export async function initializeContracts(addresses: ContractAddresses, runner: 
 
   const likwidPancakeswap = LikwidPancakeswap__factory.connect(addresses.likwidPancakeswap, runner);
 
+  const pancakeswapQuoterV2 = PancakeswapQuoterV2__factory.connect(addresses.pancakeswapQuoterV2, runner);
+
   return {
     marginChecker,
     pairPoolManager,
     marginPositionManager,
     lendingPoolManager,
     likwidPancakeswap,
+    pancakeswapQuoterV2,
   };
 }
 
@@ -121,5 +128,23 @@ export class ContractService {
   //LendingPoolManager
   async withdraw(recipient: string, poolId: string, currency: string, amount: bigint) {
     return await this.contracts.lendingPoolManager.withdraw(recipient, poolId, currency, amount);
+  }
+
+  // PancakeswapQuoterV2
+  async pancakeswapQuoteExactInputSingleV2(tokenIn: string, tokenOut: string, amountIn: bigint, fee: bigint) {
+    const params: IQuoterV2.QuoteExactInputSingleParamsStruct = {
+      tokenIn: tokenIn,
+      tokenOut: tokenOut,
+      amountIn: amountIn,
+      fee: fee,
+      sqrtPriceLimitX96: 0n,
+    };
+    const result = await this.contracts.pancakeswapQuoterV2.quoteExactInputSingle.staticCall(params);
+    return result;
+  }
+
+  //LikwidPancakeswap
+  getLikwidPancakeswap() {
+    return this.contracts.likwidPancakeswap;
   }
 }

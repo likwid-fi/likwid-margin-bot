@@ -53,7 +53,7 @@ contract LikwidPancakeswap is LikwidBase {
     function swapV3(address tokenIn, address tokenOut, uint24 fee, uint256 amountIn, uint256 amountOutMin)
         external
         payable
-        onlyOwner
+        onlyCaller
         returns (uint256 amountOut)
     {
         amountOut = _swapV3(tokenIn, tokenOut, fee, amountIn, amountOutMin);
@@ -67,7 +67,7 @@ contract LikwidPancakeswap is LikwidBase {
         uint256 likwidIn,
         uint256 likwidOutMin,
         uint256 pancakesOutMin
-    ) external payable returns (uint256 likwidOut, uint256 pancakesOut) {
+    ) external payable onlyCaller returns (uint256 likwidOut, uint256 pancakesOut) {
         SwapParams memory swapParams = SwapParams({
             poolId: poolId,
             zeroForOne: tokenIn < tokenOut,
@@ -85,6 +85,9 @@ contract LikwidPancakeswap is LikwidBase {
         }
         likwidOut = likwidRouter.exactInput{value: sendValue}(swapParams);
         pancakesOut = _swapV3(tokenOut, tokenIn, fee, likwidOut, pancakesOutMin);
+        if (pancakesOutMin > 0) {
+            require(pancakesOut >= pancakesOutMin, "InsufficientPancakesOutMin");
+        }
     }
 
     function pancakeswapToLikwid(
@@ -95,7 +98,7 @@ contract LikwidPancakeswap is LikwidBase {
         uint256 pancakesIn,
         uint256 pancakesOutMin,
         uint256 likwidOutMin
-    ) external payable returns (uint256 pancakesOut, uint256 likwidOut) {
+    ) external payable onlyCaller returns (uint256 pancakesOut, uint256 likwidOut) {
         pancakesOut = _swapV3(tokenIn, tokenOut, fee, pancakesIn, pancakesOutMin);
         uint256 sendValue;
         if (tokenOut == address(0)) {
@@ -113,5 +116,8 @@ contract LikwidPancakeswap is LikwidBase {
             deadline: block.timestamp + 100
         });
         likwidOut = likwidRouter.exactInput{value: sendValue}(swapParams);
+        if (likwidOutMin > 0) {
+            require(likwidOut >= likwidOutMin, "InsufficientLikwidOut");
+        }
     }
 }

@@ -2,13 +2,7 @@ import { ethers } from "ethers";
 import { config } from "../config/config";
 import { ContractService, initializeContracts } from "./contracts";
 
-interface Position {
-  pool_id: string;
-  position_id: string;
-  margin_amount: string;
-  margin_total: string;
-  margin_token: string;
-}
+const ONE_MILLION = 10n ** 6n;
 
 export class ArbitrageWorker {
   private provider: ethers.Provider;
@@ -17,6 +11,7 @@ export class ArbitrageWorker {
   private chainId: number;
   private recipient: string = "";
   private reconnectInterval: NodeJS.Timeout | null = null;
+  private likwidSwapGas: bigint = 1000000n;
 
   constructor(chainId: number) {
     this.chainId = chainId;
@@ -36,20 +31,27 @@ export class ArbitrageWorker {
   async start() {
     if (this.isRunning) return;
     this.isRunning = true;
+    this.runTasks();
+  }
 
-    this.reconnectInterval = setInterval(async () => {
+  async runTasks() {
+    console.log("Tasks starting...");
+    try {
+      await Promise.all([this.bnb2BTCB()]);
+      console.log("Tasks finished successfully.");
+    } catch (error) {
+      console.error("Error during tasks execution:", error);
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+    } finally {
       if (this.isRunning) {
-        await Promise.all([this.bnb2BTCB()]);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await this.runTasks();
       }
-    }, 1000);
+    }
   }
 
   stop() {
     this.isRunning = false;
-    if (this.reconnectInterval) {
-      clearInterval(this.reconnectInterval);
-      this.reconnectInterval = null;
-    }
   }
 
   private async calculateTransactionFee(estimateGas: bigint): Promise<bigint> {
@@ -59,6 +61,84 @@ export class ArbitrageWorker {
   }
 
   private async bnb2BTCB() {
+    if (this.chainId == 56) {
+      console.log("bnb2BTCB.chainId:", this.chainId);
+      const payValue = ethers.parseEther("0.1"); // 0.1 BNB
+      const poolId = "0xcb16a143966e2c74bc22b75e4aa385208270888e8a4328cb807ba055a3242e7b";
+      const fee = 100n;
+      const wbnb = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //token1
+      const btcb = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"; //token0
+      const [likwidBTCB, pancakeswapResult] = await Promise.all([
+        this.contractService.getAmountOut(poolId, true, payValue),
+        this.contractService.pancakeswapQuoteExactInputSingleV2(wbnb, btcb, payValue, fee),
+      ]);
+      const totalGas = this.likwidSwapGas + pancakeswapResult.gasEstimate;
+      const gasAmount = await this.calculateTransactionFee(totalGas);
+      console.log(
+        "bnb2BTCB.likwidBTCB:",
+        likwidBTCB,
+        ";pancakeswapResult.amountOut:",
+        pancakeswapResult.amountOut,
+        ";gasAmount:",
+        gasAmount
+      );
+      const costPPI = (gasAmount * ONE_MILLION) / payValue + 10000n;
+      const likwidPancakeswap = this.contractService.getLikwidPancakeswap();
+      const balance = await this.provider.getBalance(likwidPancakeswap.getAddress());
+      const sendValue = payValue > balance ? payValue - balance : 0;
+      console.log("bnb2BTCB.likwidPancakeswap.balance:", balance, ";sendValue:", sendValue);
+      if (likwidBTCB > pancakeswapResult.amountOut) {
+        const cutCostAmount = (likwidBTCB * (ONE_MILLION - costPPI)) / ONE_MILLION;
+        console.log("bnb2BTCB.likwidToPancakeswap.cutCostAmount:", cutCostAmount);
+        if (cutCostAmount > pancakeswapResult.amountOut) {
+          const likwidOutMin = (likwidBTCB * (ONE_MILLION - 3000n)) / ONE_MILLION; // 0.3% slipping
+          const pancakeBNB = (
+            await this.contractService.pancakeswapQuoteExactInputSingleV2(btcb, wbnb, likwidOutMin, fee)
+          ).amountOut;
+          if (pancakeBNB > payValue) {
+            const tx = await likwidPancakeswap.likwidToPancakeswap(
+              poolId,
+              ethers.ZeroAddress,
+              btcb,
+              fee,
+              payValue,
+              likwidOutMin,
+              payValue,
+              { value: sendValue }
+            );
+            console.log("bnb2BTCB.likwidToPancakeswap.tx.tx:", tx.hash);
+            const receipt = await tx.wait();
+            console.log("bnb2BTCB.likwidToPancakeswap.receipt.status:", receipt?.status);
+          } else {
+            console.log("bnb2BTCB.pancakeswapToLikwid.likwidOutMin:", likwidOutMin, ";pancakeBNB:", pancakeBNB);
+          }
+        }
+      } else {
+        const cutCostAmount = (pancakeswapResult.amountOut * (ONE_MILLION - costPPI)) / ONE_MILLION;
+        console.log("bnb2BTCB.pancakeswapToLikwid.cutCostAmount:", cutCostAmount);
+        if (cutCostAmount >= likwidBTCB) {
+          const pancakesOutMin = (pancakeswapResult.amountOut * (ONE_MILLION - 3000n)) / ONE_MILLION; // 0.3% slipping
+          const likwidBNB = await this.contractService.getAmountOut(poolId, false, pancakesOutMin);
+          if (likwidBNB > payValue) {
+            const tx = await likwidPancakeswap.pancakeswapToLikwid(
+              ethers.ZeroAddress,
+              btcb,
+              fee,
+              poolId,
+              payValue,
+              pancakesOutMin,
+              payValue,
+              { value: sendValue }
+            );
+            console.log("bnb2BTCB.pancakeswapToLikwid.tx.tx:", tx.hash);
+            const receipt = await tx.wait();
+            console.log("bnb2BTCB.pancakeswapToLikwid.receipt.status:", receipt?.status);
+          } else {
+            console.log("bnb2BTCB.pancakeswapToLikwid.pancakesOutMin:", pancakesOutMin, ";likwidBNB:", likwidBNB);
+          }
+        }
+      }
+    }
     console.log("bnb2BTCB");
   }
 }

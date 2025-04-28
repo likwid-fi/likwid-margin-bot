@@ -12,8 +12,15 @@ contract LikwidBase is Owned {
 
     address public immutable wrapNative;
     ILikwidRouter public immutable likwidRouter;
+    mapping(address => bool) public callers;
+
+    modifier onlyCaller() virtual {
+        require(callers[msg.sender], "UNAUTHORIZED");
+        _;
+    }
 
     constructor(address initialOwner, address _wrapNative, ILikwidRouter _likwidRouter) Owned(initialOwner) {
+        callers[initialOwner] = true;
         wrapNative = _wrapNative;
         likwidRouter = _likwidRouter;
     }
