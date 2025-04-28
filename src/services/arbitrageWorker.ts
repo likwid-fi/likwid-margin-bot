@@ -64,7 +64,7 @@ export class ArbitrageWorker {
     if (this.chainId == 56) {
       console.log("bnb2BTCB.chainId:", this.chainId);
       const payValue = ethers.parseEther("0.1"); // 0.1 BNB
-      const poolId = "0xcb16a143966e2c74bc22b75e4aa385208270888e8a4328cb807ba055a3242e7b";
+      const poolId = "0x6bc9f32e08e71ad40ad83153e1f98ad8930454408a345a123f20e031d774c22b";
       const fee = 100n;
       const wbnb = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"; //token1
       const btcb = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c"; //token0
