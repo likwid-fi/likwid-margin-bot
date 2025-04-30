@@ -109,7 +109,6 @@ export class EventListener {
             if (parsedLog.name === "Margin") {
               const poolId = parsedLog.args.poolId;
               const pool = this.db.getPool(this.chainId, poolId);
-              console.log(pool);
               if (!pool) continue;
               const marginToken = parsedLog.args.marginForOne ? pool.currency1 : pool.currency0;
               console.log(marginToken, validateCurrency(this.chainId, marginToken));
