@@ -134,6 +134,10 @@ export class ContractService {
     return ethers.toBigInt(hash);
   }
 
+  async balanceOf(owner: string, poolId: string, currency: string) {
+    return await this.contracts.lendingPoolManager.balanceOf(owner, this.getTokenId(currency, poolId));
+  }
+
   async withdraw(recipient: string, poolId: string, currency: string, amount: bigint) {
     return await this.contracts.lendingPoolManager.withdraw(recipient, poolId, currency, amount);
   }
