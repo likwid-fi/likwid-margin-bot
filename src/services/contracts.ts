@@ -1,4 +1,4 @@
-import { ContractRunner } from "ethers";
+import { ContractRunner, ethers } from "ethers";
 import type { PairPoolManager } from "../types/contracts/PairPoolManager";
 import { PairPoolManager__factory } from "../types/contracts/factories/PairPoolManager__factory";
 import type { MarginPositionManager } from "../types/contracts/MarginPositionManager";
@@ -126,6 +126,14 @@ export class ContractService {
   }
 
   //LendingPoolManager
+  getTokenId(currency: string, poolId: string) {
+    const typesToEncode = ["address", "bytes32"];
+    const valuesToEncode = [currency, poolId];
+    const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(typesToEncode, valuesToEncode);
+    const hash = ethers.keccak256(encodedData);
+    return ethers.toBigInt(hash);
+  }
+
   async withdraw(recipient: string, poolId: string, currency: string, amount: bigint) {
     return await this.contracts.lendingPoolManager.withdraw(recipient, poolId, currency, amount);
   }
