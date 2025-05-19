@@ -10,5 +10,6 @@ struct SwapParams {
     uint256 amountIn;
     uint256 amountOutMin;
     uint256 amountOut;
+    uint256 amountInMax;
     uint256 deadline;
 }

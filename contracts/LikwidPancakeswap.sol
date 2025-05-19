@@ -85,6 +85,7 @@ contract LikwidPancakeswap is LikwidBase {
             amountIn: likwidIn,
             amountOutMin: likwidOutMin,
             amountOut: 0,
+            amountInMax: 0,
             deadline: block.timestamp + 100
         });
         uint256 sendValue;
@@ -123,6 +124,7 @@ contract LikwidPancakeswap is LikwidBase {
             amountIn: pancakesOut,
             amountOutMin: likwidOutMin,
             amountOut: 0,
+            amountInMax: 0,
             deadline: block.timestamp + 100
         });
         likwidOut = likwidRouter.exactInput{value: sendValue}(swapParams);
