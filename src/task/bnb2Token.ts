@@ -5,12 +5,17 @@ export async function bnb2Token(worker: ArbitrageWorker, poolId: string, token: 
   if (worker.chainId == 56) {
     console.log("bnb2Token.chainId:", worker.chainId, ",token:", token);
     const payValue = ethers.parseEther("0.05"); // 0.05 BNB
-    const fee = 500n;
+    const fee = 10000n;
     const wbnb = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
-    const [likwidToken, pancakeswapResult] = await Promise.all([
-      worker.contractService.getAmountOut(poolId, true, payValue),
-      worker.contractService.pancakeswapQuoteExactInputSingleV2(wbnb, token, payValue, fee),
-    ]);
+    const likwidToken = await worker.contractService.getAmountOut(poolId, true, payValue);
+    console.log("likwidToken:", likwidToken);
+    const pancakeswapResult = await worker.contractService.pancakeswapQuoteExactInputSingleV2(
+      wbnb,
+      token,
+      payValue,
+      fee
+    );
+    console.log("pancakeswapResult:", pancakeswapResult);
     const totalGas = worker.likwidSwapGas + pancakeswapResult.gasEstimate;
     const gasAmount = await worker.calculateTransactionFee(totalGas);
     console.log(
