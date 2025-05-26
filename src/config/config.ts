@@ -98,12 +98,12 @@ export const config: Config = {
       // BSC_MAINNET
       rpcUrl: requireEnv("BSC_MAINNET_RPC"),
       contracts: {
-        startBlock: 48750048,
-        marginChecker: "0xcBd4086E29928E2538b1DbdA803D44F0F078aF16",
-        lendingPoolManager: "0xACE4b5572CAab534d611AfE413fDE5E23Baef6fd",
-        pairPoolManager: "0x947FB7c0aA370E741DaE9927680bB3714Ca745EC",
-        marginPositionManager: "0x6170bEd496E83136e60ADcbe539226a4b9c67Ad5",
-        likwidPancakeswap: "0x9DB31f99c4e0a8fAE8F6B3f2C57E785436348EFc",
+        startBlock: 50231527,
+        marginChecker: "0x0Caf19c06ea707e831c03715eC822bfAc484E511",
+        lendingPoolManager: "0x58B5Fb66b90259b8B97888BB6eC2b63A5723cb35",
+        pairPoolManager: "0x4C136fc2DCE4CaBDd9a5BABFF48BA06bEfA356DC",
+        marginPositionManager: "0x2Fb40cAf8b8963D1Ad08c6e4Bf6db2596E062B74",
+        likwidPancakeswap: "0xbe544eE57669103Fe193201cE0448d3c468298Dc",
         pancakeswapQuoterV2: "0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997",
       },
       currencies: {
