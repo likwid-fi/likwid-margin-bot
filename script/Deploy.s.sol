@@ -14,7 +14,7 @@ contract DeployScript is Script {
     function run(uint256 chainId) public {
         vm.startBroadcast();
         if (chainId == 56) {
-            ILikwidRouter likwidRouter = ILikwidRouter(0xF8CC0B9D202B944e4Dc30AB5C8203f2F9d2A87Ea);
+            ILikwidRouter likwidRouter = ILikwidRouter(0xc1A470BA1161257cb05d95EbA0f4E5D9e5eB0A3D);
             IUniversalRouter router = IUniversalRouter(0x1A0A18AC4BECDDbd6389559687d1A73d8927E416);
             address wbnb = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
             pancakeswap = new LikwidPancakeswap(msg.sender, wbnb, likwidRouter, router);
