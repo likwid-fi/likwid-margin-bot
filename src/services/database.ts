@@ -69,7 +69,20 @@ export class DatabaseService {
       ON margin_positions(pool_id);
       
     CREATE INDEX IF NOT EXISTS idx_margin_positions_margin_token 
-      ON margin_positions(margin_token);     
+      ON margin_positions(margin_token);   
+
+    CREATE TABLE IF NOT EXISTS v2_lp_log (
+        chain_id INTEGER,
+        v2_pair TEXT,
+        tx_hash TEXT,
+        log_index TEXT,
+        from_address TEXT,
+        to_address TEXT,
+        amount TEXT,
+        block_number INTEGER,
+        log_time INTEGER,
+        PRIMARY KEY (chain_id, v2_pair, tx_hash, log_index)
+      ); 
     `);
 
     this.createTimestampTrigger("margin_positions", ["chain_id", "manager_address", "position_id"]);
@@ -87,6 +100,38 @@ export class DatabaseService {
            currency1 = excluded.currency1`
       )
       .run(params.chainId, params.poolId, params.currency0, params.currency1);
+  }
+
+  saveV2LpLog(params: {
+    chainId: number;
+    v2_pair: string;
+    tx_hash: string;
+    log_index: number;
+    from: string;
+    to: string;
+    amount: string;
+    block_number: number;
+    log_time: number;
+  }) {
+    this.db
+      .prepare(
+        `INSERT INTO v2_lp_log (chain_id, v2_pair, tx_hash, log_index, from_address, to_address, amount,block_number, log_time) 
+         VALUES (?, ?, ?,?, ?, ?, ?,?, ?)
+         ON CONFLICT(chain_id, v2_pair, tx_hash, log_index) 
+         DO UPDATE SET 
+           log_time = excluded.log_time`
+      )
+      .run(
+        params.chainId,
+        params.v2_pair,
+        params.tx_hash,
+        params.log_index,
+        params.from,
+        params.to,
+        params.amount,
+        params.block_number,
+        params.log_time
+      );
   }
 
   // Get pool

@@ -37,3 +37,4 @@ broadcast/LocalTests.s.sol
 script/LocalTests.s.sol
 src/task/devTest.ts
 test.sh
+script/TaskBSC.s.sol

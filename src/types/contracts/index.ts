@@ -9,6 +9,7 @@ export type { MarginPositionManager } from "./MarginPositionManager";
 export type { PairPoolManager } from "./PairPoolManager";
 export type { PancakeswapQuoterV2 } from "./PancakeswapQuoterV2";
 export type { UniswapQuoterV4 } from "./UniswapQuoterV4";
+export type { UniswapV2Pair } from "./UniswapV2Pair";
 export * as factories from "./factories";
 export { ERC20__factory } from "./factories/ERC20__factory";
 export { LendingPoolManager__factory } from "./factories/LendingPoolManager__factory";
@@ -18,3 +19,4 @@ export { MarginPositionManager__factory } from "./factories/MarginPositionManage
 export { PairPoolManager__factory } from "./factories/PairPoolManager__factory";
 export { PancakeswapQuoterV2__factory } from "./factories/PancakeswapQuoterV2__factory";
 export { UniswapQuoterV4__factory } from "./factories/UniswapQuoterV4__factory";
+export { UniswapV2Pair__factory } from "./factories/UniswapV2Pair__factory";

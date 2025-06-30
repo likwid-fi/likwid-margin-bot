@@ -72,6 +72,32 @@ export const config: Config = {
         },
       },
     },
+    1: {
+      rpcUrl: "https://eth.llamarpc.com",
+      contracts: {
+        startBlock: 7461647,
+        marginChecker: "0x27354b639DCBA5dC85343019367f3b494161aA48",
+        pairPoolManager: "0x59036D328EFF4dAb2E33E04a60A5D810Df90C888",
+        marginPositionManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
+        lendingPoolManager: "0xE6D26C9B26613b84c2C903a52348879A8dAF422F",
+        likwidPancakeswap: "0xa6BcB4e1C6Cf22E9Ee8afEceF8d02F336FDF4362",
+        pancakeswapQuoterV2: "",
+      },
+      currencies: {
+        "0x0000000000000000000000000000000000000000": {
+          name: "ETH",
+          minEtherPrice: ethers.parseEther("1"),
+        },
+        "0x692CA9D3078Aa6b54F2F0e33Ed20D30489854A21": {
+          name: "PEPE",
+          minEtherPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 PEPE
+        },
+        "0x8b099f91c710ce9e5ee5b7f2e83db9bac3378975": {
+          name: "LIKWID",
+          minEtherPrice: ethers.parseEther("0.001"), // 1 ETH = 1000 LIKWID
+        },
+      },
+    },
     97: {
       rpcUrl: "http://10.148.0.7:8545",
       contracts: {
@@ -96,7 +122,8 @@ export const config: Config = {
     },
     56: {
       // BSC_MAINNET
-      rpcUrl: requireEnv("BSC_MAINNET_RPC"),
+      // rpcUrl: requireEnv("BSC_MAINNET_RPC"),
+      rpcUrl: "https://binance.llamarpc.com",
       contracts: {
         startBlock: 50231527,
         marginChecker: "0x0Caf19c06ea707e831c03715eC822bfAc484E511",
